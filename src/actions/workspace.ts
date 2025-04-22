@@ -104,43 +104,43 @@ export const getUserAllWorkspaces = async () => {
   }
 }
 
-
 export const createWorkspace = async (data: { name: string }) => {
   try {
+    console.log('🛠️ Creating workspace:', data.name)
+
     const cookieStore = cookies()
     const sessionId = (await cookieStore).get('session_id')?.value
-
-    if (!sessionId) return { status: 401, data: 'Unauthorized' }
-
-    const sessionData = await redis.get(`session:${sessionId}`)
-    if (!sessionData) return { status: 401, data: 'Unauthorized' }
-
-    const user = JSON.parse(sessionData)
-
-    // Check cache to avoid duplicates
-    const cacheKey = `workspace:name:${data.name}`
-    const existingInCache = await redis.get(cacheKey)
-    if (existingInCache) {
-      return {
-        status: 400,
-        data: 'This workspace already exists (cached). Try a different name.',
-      }
+    if (!sessionId) {
+      console.error('❌ No session ID in cookies.')
+      return { status: 401, data: 'Unauthorized' }
     }
 
-    const existing = await prisma.workspaces.findFirst({
+    const sessionData = await redis.get(`session:${sessionId}`)
+    if (!sessionData) {
+      console.error('❌ Session not found in Redis.')
+      return { status: 401, data: 'Unauthorized' }
+    }
+
+    const user = JSON.parse(sessionData)
+    if (!user?.id || !user?.email) {
+      console.error('❌ User info missing in session.')
+      return { status: 401, data: 'Unauthorized' }
+    }
+
+    // Check in DB
+    const existingWorkspace = await prisma.workspaces.findFirst({
       where: { name: data.name },
     })
-    if (existing) {
-      await redis.set(cacheKey, 'true', 'EX', 60 * 10) // cache for 10 mins
+
+    if (existingWorkspace) {
       return {
         status: 400,
         data: 'This workspace already exists. Try a different name.',
       }
     }
 
-    // Start transaction
-    const createdData = await prisma.$transaction(async (tx) => {
-      // Create workspace
+    // Transaction: create workspace + roles + permissions
+    const createdWorkspace = await prisma.$transaction(async (tx) => {
       const workspace = await tx.workspaces.create({
         data: {
           name: data.name,
@@ -148,44 +148,46 @@ export const createWorkspace = async (data: { name: string }) => {
         },
       })
 
-      // Create default roles
-      const rolesArray = Object.values(defaultRoles)
-      const roleInserts = rolesArray.map((role) =>
-        tx.roles.create({
-          data: {
-            name: role,
-            workspaceId: workspace.id,
-            userId: user.id
-          },
-        })
+      // Create roles
+      const roleEntries = Object.values(defaultRoles)
+      const roleRecords = await Promise.all(
+        roleEntries.map((roleName) =>
+          tx.roles.create({
+            data: {
+              name: roleName,
+              workspaceId: workspace.id,
+              userId: user.id,
+            },
+          })
+        )
       )
-      const roles = await Promise.all(roleInserts)
 
       // Create permissions
-      const permissionInserts = PermissionsForWorkspace.map((perm) =>
-        tx.permission.create({
-          data: {
-            title: perm.title,
-            type: perm.type as PermissionType,
-            workspaceId: workspace.id,
-            userId: user.id
-          },
-        })
+      const permissionRecords = await Promise.all(
+        PermissionsForWorkspace.map((perm) =>
+          tx.permission.create({
+            data: {
+              title: perm.title,
+              type: perm.type as PermissionType,
+              workspaceId: workspace.id,
+              userId: user.id,
+            },
+          })
+        )
       )
-      const permissions = await Promise.all(permissionInserts)
 
-      // Role-permission mapping
-      const rolePermissions = []
-      for (const perm of permissions) {
+      // Map role-permission relationships
+      const rolePermMappings = []
+      for (const perm of permissionRecords) {
         const config = PermissionsForWorkspace.find((p) => p.title === perm.title)
         if (!config) continue
 
-        const matchedRoles = roles.filter((r: any) =>
+        const rolesWithAccess = roleRecords.filter((r) =>
           config.hasPermission.includes(r.name)
         )
 
-        for (const role of matchedRoles) {
-          rolePermissions.push(
+        for (const role of rolesWithAccess) {
+          rolePermMappings.push(
             tx.rolePermission.create({
               data: {
                 roleId: role.id,
@@ -196,10 +198,11 @@ export const createWorkspace = async (data: { name: string }) => {
           )
         }
       }
-      await Promise.all(rolePermissions)
 
-      // Add owner as admin member
-      const adminRole = roles.find((r: any) => r.name === defaultRoles.ADMIN)
+      await Promise.all(rolePermMappings)
+
+      // Add user as admin member
+      const adminRole = roleRecords.find((r) => r.name === defaultRoles.ADMIN)
       await tx.members.create({
         data: {
           userId: user.id,
@@ -211,18 +214,10 @@ export const createWorkspace = async (data: { name: string }) => {
       return workspace
     })
 
-    // Cache workspace name and details
-    await redis.set(cacheKey, 'true', 'EX', 60 * 10)
-    await redis.set(
-      `workspace:${createdData.id}`,
-      JSON.stringify(createdData),
-      'EX',
-      60 * 60 * 24
-    )
-
+    console.log('✅ Workspace created:', createdWorkspace.id)
     return { status: 200, data: 'Workspace created successfully' }
   } catch (error) {
-    console.error('❌ Error creating workspace:', error)
+    console.error('❌ Error in createWorkspace:', error)
     return { status: 500, data: 'Internal server error' }
   }
 }
