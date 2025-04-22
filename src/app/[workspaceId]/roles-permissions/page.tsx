@@ -26,14 +26,16 @@ const RolesAndPermissions = () => {
   return (
     <div className="bg-[#222222] flex flex-col items-center min-h-screen w-full mx-auto  relative">
       {/* Top Bar */}
+      
       <div className="w-full flex justify-between items-center px-6 py-4 absolute top-0 left-0 ">
         {/* Events on the Left */}
         <h1 className="boldonse text-[30px] text-white">
-          <Link href="/">events</Link>
+          <Link href="/">events testing</Link>
         </h1>
 
         <div className="bg-amber-300 rounded-full py-2 px-2.5 text-black font-semibold">
           {email?.slice(0, 2).toUpperCase()}
+          
         </div>
       </div>
 
