@@ -17,36 +17,79 @@ model User {
   createdAt    DateTime     @default(now())
   Workspaces   Workspaces[]
   Members      Members[]
+  Roles        Roles[]
+  Permission   Permission[]
 }
 
+
 model Workspaces {
-  id          String    @id @default(uuid())
-  name        String
-  ownerId     String
-  user        User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  isOnboarded Boolean   @default(false)
-  members     Members[]
-  roles       Roles[]
+  id           String     @id @default(uuid())
+  name         String
+  ownerId      String
+  user         User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  isOnboarded  Boolean    @default(false)
+  
+  members      Members[]
+  roles        Roles[]
+  permissions  Permission[]
+  rolePermissions RolePermission[]
 }
 
 model Members {
   id          String     @id @default(uuid())
   userId      String
   workspaceId String
+  rolesId     String?
+
   user        User       @relation(fields: [userId], references: [id])
   workspace   Workspaces @relation(fields: [workspaceId], references: [id])
+  
+  Roles       Roles?     @relation(name: "RoleOnMember", fields: [rolesId], references: [id])
   createdAt   DateTime   @default(now())
-  Roles       Roles?     @relation(fields: [rolesId], references: [id])
-  rolesId     String?
 }
 
 model Roles {
   id          String     @id @default(uuid())
   name        String
   workspaceId String
-  workspace   Workspaces @relation(fields: [workspaceId], references: [id])
-  members     Members[]
+  userId      String     // Added userId to associate a role with a user
+
+  workspace   Workspaces @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)  // Added relationship to User
+  members     Members[]  @relation(name: "RoleOnMember")
+  rolePermissions RolePermission[]
   createdAt   DateTime   @default(now())
+}
+
+model Permission {
+  id              String           @id @default(uuid())
+  title           String
+  type            PermissionType
+  workspaceId     String
+  userId          String           // Added userId to track who is creating the permission
+  workspace       Workspaces       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)  // Relation to User model
+  rolePermissions RolePermission[]
+  createdAt       DateTime         @default(now())
+}
+
+model RolePermission {
+  id            String      @id @default(uuid())
+  roleId        String
+  permissionId  String
+  workspaceId   String
+
+  role          Roles       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission    Permission  @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  workspace     Workspaces  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime    @default(now())
+}
+
+enum PermissionType {
+  WORKSPACE
+  EVENT
+  TASK
 }

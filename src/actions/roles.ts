@@ -2,6 +2,8 @@
 import { cookies } from 'next/headers'
 import { prisma } from '../lib/prisma'
 import redis from '../lib/redis'
+import { defaultRoles } from '../enums/constantRoles'
+
 
 export const getWorkspaceAllRoles = async (workspaceId: string) => {
   try {
@@ -107,6 +109,12 @@ export const deleteRole = async (roleId: string, workspaceId: string) => {
     if (!role) {
       console.error('❌ Role not found:', roleId)
       return { status: 404, data: 'Role not found' }
+    }
+
+    // ❌ Prevent deleting ADMIN role
+    if (role.name === defaultRoles.ADMIN) {
+      console.warn('⛔ Attempt to delete protected ADMIN role:', roleId)
+      return { status: 403, data: 'Cannot delete the ADMIN role' }
     }
 
     // ✅ Delete role from database
