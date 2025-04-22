@@ -65,6 +65,8 @@ export const getUserAllWorkspaces = async () => {
   }
 }
 
+
+
 export const createWorkspace = async (data: { name: string }) => {
   try {
     console.log('🛠️ Creating workspace:', data.name)
@@ -94,6 +96,7 @@ export const createWorkspace = async (data: { name: string }) => {
     })
 
     if (existingWorkspace) {
+      console.log('❌ Workspace already exists')
       return {
         status: 400,
         data: 'This workspace already exists. Try a different name.',
