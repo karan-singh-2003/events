@@ -8,24 +8,27 @@ import Sidebar from '../components/LandingPage/Sidebar'
 import { useDispatch, useSelector } from 'react-redux'
 import { toggleSidebar } from '../store/sidebarSlice'
 import { RootState } from '../store/store'
-import { setUserEmail, setUserRole } from '../store/userSlice'
+import { setUserEmail, setUserIsAdmin } from '../store/userSlice'
+
 const LandingPage = () => {
   const dispatch = useDispatch()
   const [Email, setEmail] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+
   useEffect(() => {
     const fetchSession = async () => {
       try {
         const res = await fetch('/api/auth/session')
         const data = await res.json()
         console.log('sessionData in useEffect Page.tsx:', data)
+
         if (res.ok) {
           setEmail(data.user?.email)
           dispatch(setUserEmail(data.user?.email))
-          console.log('setting role in User Slice', data.user?.name)
-          dispatch(setUserRole(data.user?.name))
+          console.log('setting isAdmin in User Slice', data.user?.isAdmin)
+          dispatch(setUserIsAdmin(data.user?.isAdmin || false)) // ✅ Set isAdmin
         } else {
-          setUserEmail(null)
+          dispatch(setUserEmail(null))
         }
       } catch (error) {
         console.error('Error fetching session:', error)

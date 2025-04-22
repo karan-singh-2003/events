@@ -1,28 +1,32 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '@/src/store/store'
+import { setUserEmail, setUserIsAdmin } from '@/src/store/userSlice'
+import { toggleAddWorkspaceModal } from '@/src/store/workspaceSlice'
+
 import Badge from '@/src/components/global/Badge'
 import CustomButton from '@/src/components/global/CustomButton'
-import { useDispatch, useSelector } from 'react-redux'
-import { toggleAddWorkspaceModal } from '@/src/store/workspaceSlice'
 import AddWorkspaceModal from '@/src/components/Workspace/AddWorkspace'
 import PageLoader from '@/src/components/global/PageLoader'
-import { useEffect, useState } from 'react'
-import { RootState } from '@/src/store/store'
-import { setUserEmail, setUserRole } from '@/src/store/userSlice'
-
-import { useRouter } from 'next/navigation'
 import WorkspaceList from '@/src/components/Workspace/WorkspaceList'
 
 const ChooseWorkspace = () => {
   const router = useRouter()
   const dispatch = useDispatch()
+
+  // Redux state
   const email = useSelector((state: RootState) => state.user.email)
-  console.log('email in ChooseWorkspace:', email)
-  const role = useSelector((state: RootState) => state.user.role)
-  console.log('role in ChooseWorkspace:', role)
+  const isAdmin = useSelector((state: RootState) => state.user.isAdmin)
+
+  console.log('Email in ChooseWorkspace:', email)
+  console.log('Is Admin in ChooseWorkspace:', isAdmin)
+
   const [loading, setLoading] = useState(true)
 
+  // Fetch session data and check user role
   useEffect(() => {
     const fetchSessionAndWorkspaces = async () => {
       try {
@@ -31,8 +35,8 @@ const ChooseWorkspace = () => {
         console.log('Session Data:', data)
 
         if (res.ok && data.isLoggedIn) {
-          dispatch(setUserRole(data.user.name))
           dispatch(setUserEmail(data.user.email))
+          dispatch(setUserIsAdmin(data.user.isAdmin)) // ✅ Store `isAdmin` in Redux
         } else {
           dispatch(setUserEmail(null))
           router.push('/login')
@@ -49,11 +53,12 @@ const ChooseWorkspace = () => {
   }, [dispatch, router])
 
   if (loading) return <PageLoader />
+
   return (
-    <div className="bg-[#222222] flex flex-col items-center h-screen relative  w-full mx-auto overflow-hidden">
-      {/* 🔹 Header: `events` on the Left & `NC` on the Right */}
+    <div className="bg-[#222222] flex flex-col items-center h-screen relative w-full mx-auto overflow-hidden">
+      {/* 🔹 Header */}
       <div className="w-full flex justify-between items-center px-6 py-4">
-        <h1 className="text-[30px]  boldonse  text-white">
+        <h1 className="text-[30px] font-bold text-white">
           <Link href="/">events</Link>
         </h1>
         <div className="bg-amber-300 rounded-full py-2 px-2.5 text-black font-semibold">
@@ -61,7 +66,7 @@ const ChooseWorkspace = () => {
         </div>
       </div>
 
-      <h4 className="text-[#ffffff] font-poppins font-semibold text-[30px] mt-8 mb-2">
+      <h4 className="text-[#ffffff] font-semibold text-[30px] mt-8 mb-2">
         Choose Workspace
       </h4>
       <h6 className="text-[#919191]">
@@ -69,24 +74,27 @@ const ChooseWorkspace = () => {
       </h6>
 
       <WorkspaceList />
-      {role === 'Admin' && (
-        <div className="flex items-center w-[470px] mt-8">
-          <hr className="flex-1 border-t border-[#3f3f3f]" />
-          <span className="mx-4 text-[#929292] font-medium">OR</span>
-          <hr className="flex-1 border-t border-[#3f3f3f]" />
-        </div>
+
+      {/* 🔹 Show "Create Workspace" button only if user is an Admin */}
+      {isAdmin && (
+        <>
+          <div className="flex items-center w-[470px] mt-8">
+            <hr className="flex-1 border-t border-[#3f3f3f]" />
+            <span className="mx-4 text-[#929292] font-medium">OR</span>
+            <hr className="flex-1 border-t border-[#3f3f3f]" />
+          </div>
+
+          <CustomButton
+            className="bg-[#635BFF] text-[16px] px-8 mt-8 hover:bg-[#635BFF]/80 w-full max-w-[470px] h-12 rounded-none"
+            onClick={() => {
+              dispatch(toggleAddWorkspaceModal())
+            }}
+          >
+            Create Workspace
+          </CustomButton>
+        </>
       )}
 
-      {role === 'Admin' && (
-        <CustomButton
-          className="bg-[#635BFF] text-[16px] px-8 mt-8 hover:bg-[#635BFF]/80 w-full max-w-[470px] h-12 rounded-none"
-          onClick={() => {
-            dispatch(toggleAddWorkspaceModal())
-          }}
-        >
-          Create Workspace
-        </CustomButton>
-      )}
       <AddWorkspaceModal />
     </div>
   )

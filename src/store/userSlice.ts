@@ -1,13 +1,17 @@
+// 
+
+
+
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 interface UserState {
   email: string | null
-  role: string | null
+  isAdmin: boolean
 }
 
 const initialState: UserState = {
   email: null,
-  role: null,
+  isAdmin: false, // Default to `false`
 }
 
 const userSlice = createSlice({
@@ -17,14 +21,11 @@ const userSlice = createSlice({
     setUserEmail: (state, action: PayloadAction<string | null>) => {
       state.email = action.payload
     },
-    clearUser: (state) => {
-      state.email = null
-    },
-    setUserRole: (state, action: PayloadAction<string | null>) => {
-      state.role = action.payload
+    setUserIsAdmin: (state, action: PayloadAction<boolean>) => {
+      state.isAdmin = action.payload // ✅ Store `isAdmin`
     },
   },
 })
 
-export const { setUserEmail, clearUser, setUserRole } = userSlice.actions
+export const { setUserEmail, setUserIsAdmin } = userSlice.actions
 export default userSlice.reducer

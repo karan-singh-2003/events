@@ -33,7 +33,7 @@ const WorkspaceList: React.FC = () => {
   }
   return (
     <div className="relative mt-8">
-      <div className="absolute -top-4 left-0 w-full h-8 bg-gradient-to-b from-[#000000] to-transparent z-10 pointer-events-none"></div>
+      {/* <div className="absolute -top-4 left-0 w-full h-8 bg-gradient-to-b from-[#000000] to-transparent z-10 pointer-events-none"></div> */}
 
       {Array.isArray(workspaces) && workspaces.length > 0 ? (
         <div className="max-h-[400px] overflow-y-auto space-y-2 scrollbar-hide dark-scrollbar relative w-[470px]">
@@ -57,7 +57,7 @@ const WorkspaceList: React.FC = () => {
         </p>
       )}
 
-      <div className="absolute -bottom-5 left-0 w-full h-8 bg-gradient-to-t from-[#020202] to-transparent z-10 pointer-events-none"></div>
+      {/* <div className="absolute -bottom-5 left-0 w-full h-8 bg-gradient-to-t from-[#020202] to-transparent z-10 pointer-events-none"></div> */}
     </div>
   )
 }

@@ -30,10 +30,15 @@ export const logInUser = async (data: {
       return { status: 401, data: 'Invalid university ID or password' }
     }
 
-    const isPasswordValid = await bcrypt.compare(data.password, user.password)
-    if (!isPasswordValid) {
+    // const isPasswordValid = await bcrypt.compare(data.password, user.password)
+    // if (!isPasswordValid) {
+    //   return { status: 401, data: 'Invalid university ID or password' }
+    // }
+
+    if (data.password !== user.password) {
       return { status: 401, data: 'Invalid university ID or password' }
     }
+
 
     // ✅ **Cache full session in Redis**
     await redis.set(`session:${user.universityId}`, JSON.stringify(user))

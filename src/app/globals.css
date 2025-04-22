@@ -81,8 +81,8 @@
 
 @font-face {
   font-family: 'Boldonse';
-  src: url('/fonts/Boldonse.woff2') format('woff2'),
-    url('/fonts/Boldonse.woff') format('woff');
+  src: url('/fonts/Boldonse-Regular.ttf') format('ttf'),
+    url('/fonts/Boldonse-Regular.ttf') format('woff');
   font-weight: normal;
   font-style: normal;
 }
