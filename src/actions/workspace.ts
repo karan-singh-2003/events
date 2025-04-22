@@ -8,98 +8,59 @@ import { PermissionsForWorkspace } from '../enums/constants'
 import { any } from 'zod'
 import { PermissionType } from '@prisma/client'
 
+
 export const getUserAllWorkspaces = async () => {
-  console.log('Fetching workspaces...')
+  console.log('fetching workspaces')
   try {
     const cookieStore = cookies()
     const sessionId = (await cookieStore).get('session_id')?.value
 
     if (!sessionId) {
-      console.error('❌ No session found in cookies.')
+      console.error(' No session found in cookies.')
       return { status: 401, data: 'Unauthorized' }
     }
 
     const sessionData = await redis.get(`session:${sessionId}`)
     if (!sessionData) {
-      console.error('❌ No session data found in Redis.')
+      console.error(' No session data found in Redis.')
       return { status: 401, data: 'Unauthorized' }
     }
 
     const user = JSON.parse(sessionData)
-    if (!user.id || !user.email) {
-      console.error('❌ User info missing in session.')
+    if (!user.email) {
+      console.error(' User email missing from session.')
       return { status: 401, data: 'Unauthorized' }
     }
 
-    const cacheKey = `user:${user.id}:workspaces`
-    const cached = await redis.get(cacheKey)
-    if (cached) {
-      console.log('✅ Returning workspaces from cache')
-      return { status: 200, data: JSON.parse(cached) }
-    }
-
     const workspaces = await prisma.$queryRaw`
-      WITH owner_workspaces AS (
-        SELECT 
-            w.id AS "workspaceId",
-            w.name AS "workspaceName",
-            w."isOnboarded",
-            u.id AS "ownerId",
-            u.name AS "ownerName",
-            u.email AS "ownerEmail",
-            COUNT(m.id) AS "membersCount",
-            COALESCE(json_agg(
-                json_build_object(
-                    'id', u2.id,
-                    'name', u2.name,
-                    'email', u2.email,
-                    'isAdmin', u2."isAdmin"
-                )
-            ) FILTER (WHERE u2.id IS NOT NULL), '[]'::json) AS "members"
-        FROM "Workspaces" w
-        JOIN "User" u ON w."ownerId" = u.id
-        LEFT JOIN "Members" m ON w.id = m."workspaceId"
-        LEFT JOIN "User" u2 ON m."userId" = u2.id
-        WHERE u.email = ${user.email}
-        GROUP BY w.id, u.id
-      ),
-      member_workspaces AS (
-        SELECT 
-            w.id AS "workspaceId",
-            w.name AS "workspaceName",
-            w."isOnboarded",
-            u.id AS "ownerId",
-            u.name AS "ownerName",
-            u.email AS "ownerEmail",
-            COUNT(m2.id) AS "membersCount",
-            COALESCE(json_agg(
-                json_build_object(
-                    'id', u3.id,
-                    'name', u3.name,
-                    'email', u3.email,
-                    'isAdmin', u3."isAdmin"
-                )
-            ) FILTER (WHERE u3.id IS NOT NULL), '[]'::json) AS "members"
-        FROM "Members" m1
-        JOIN "Workspaces" w ON m1."workspaceId" = w.id
-        JOIN "User" u ON w."ownerId" = u.id
-        LEFT JOIN "Members" m2 ON w.id = m2."workspaceId"
-        LEFT JOIN "User" u3 ON m2."userId" = u3.id
-        WHERE m1."userId" = ${user.id}
-        GROUP BY w.id, u.id
-      )
-
-      SELECT DISTINCT * FROM owner_workspaces
-      UNION
-      SELECT DISTINCT * FROM member_workspaces;
+      SELECT 
+          w.id AS "workspaceId",
+          w.name AS "workspaceName",
+          u.id AS "ownerId",
+          w."isOnboarded",
+          u.name AS "ownerName",
+          u.email AS "ownerEmail",
+          COUNT(m.id) AS "membersCount",
+          COALESCE(json_agg(
+              json_build_object(
+                  'id', u2.id,
+                  'name', u2.name,
+                  'email', u2.email,
+                  'isAdmin', u2."isAdmin"
+              )
+          ) FILTER (WHERE u2.id IS NOT NULL), '[]'::json) AS "members"
+      FROM "Workspaces" w
+      JOIN "User" u ON w."ownerId" = u.id
+      LEFT JOIN "Members" m ON w.id = m."workspaceId"
+      LEFT JOIN "User" u2 ON m."userId" = u2.id
+      WHERE u.email = ${user.email}
+      GROUP BY w.id, w.name, w."isOnboarded", u.id, u.name, u.email;
     `
 
-    console.log('✅ Workspaces fetched from DB')
-    await redis.set(cacheKey, JSON.stringify(workspaces), 'EX', 60 * 5) // cache 5 mins
-
+    console.log('fetched workspaces from db')
     return { status: 200, data: workspaces ?? [] }
   } catch (error) {
-    console.error('❌ Error fetching workspaces:', error)
+    console.error(' Error fetching workspaces:', error)
     return { status: 500, data: 'Internal server error' }
   }
 }
