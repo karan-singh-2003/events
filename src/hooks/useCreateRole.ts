@@ -32,7 +32,7 @@ const useCreateRole = ( workspaceId:any) => {
   })
 
   const { register, errors, onFormSubmit, isValid, watch, control, setValue } =
-    useZodForm(RolesArraySchema, mutate)
+    useZodForm(SingleRoleSchema, mutate)
 
   return {
     register,
