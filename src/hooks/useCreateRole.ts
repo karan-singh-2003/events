@@ -1,18 +1,18 @@
 import useMutationData from './useMutationData'
 import useZodForm from './useZodForm'
 import { createRole } from '../actions/roles'
-import { RolesArraySchema } from '../schemas/createRoleSchema'
+import { SingleRoleSchema} from '../schemas/createRoleSchema'
 import { useState } from 'react'
 import { toggleAddRolesModal } from '../store/rolesSlice'
 import { useDispatch } from 'react-redux'
-const useCreateRole = () => {
+const useCreateRole = ( workspaceId:any) => {
   const dispatch = useDispatch()
   const [serverError, setServerError] = useState<string | null>(null)
   const { mutate, isPending, data } = useMutationData({
     mutationKey: ['createRole'],
-    mutationFn: async (data: { roles: { name: string }[] }) => {
+    mutationFn: async (data: { name: string, workspaceId: string }) => {
       console.log('Creating workspace with data:', data)
-      console.log('creating roles', data.roles)
+      
       const response = await createRole(data)
       if (response.status !== 200) {
         throw new Error(

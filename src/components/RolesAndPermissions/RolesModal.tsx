@@ -8,12 +8,16 @@ import { toggleAddRolesModal } from '../../store/rolesSlice'
 import BadgeInput from '../global/BadgeInput'
 import useCreateRole from '@/src/hooks/useCreateRole'
 import { ErrorMessage } from '@hookform/error-message'
+import { useParams } from 'next/navigation'
 const RolesModal = () => {
   const dispatch = useDispatch()
   const isAddRolesModalOpen = useSelector(
     (state: RootState) => state.roles.isAddRolesModalOpen
   )
-  const { errors, onFormSubmit, isValid, watch, control } = useCreateRole()
+  const params = useParams()
+  const workspaceId = params?.workspaceId as string
+
+  const { errors, onFormSubmit, isValid, watch, control } = useCreateRole(workspaceId)
   const roles = watch('roles')
   console.log('Roles:', roles)
   console.log('Form Errors:', errors)

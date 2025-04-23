@@ -37,7 +37,8 @@ const WorkspacePermissions = ({
                 color: textColor,
               }}
             >
-              {role}
+              {role} 
+              
             </span>
           )
         })}
