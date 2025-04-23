@@ -31,6 +31,7 @@ const WorkspaceCard = ({
     <div className="flex items-center justify-between mt-1.5 py-3 px-4 bg-transparent rounded-none hover:bg-[#292929] transition-all duration-200">
       <div className="flex items-center justify-between w-full">
         <div className="flex items-center">
+          
           <div
             className={clsx(
               'w-10 h-10 rounded-full flex font-bold items-center justify-center text-lg text-white shadow-md',

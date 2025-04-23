@@ -26,7 +26,9 @@ model Workspaces {
   id           String     @id @default(uuid())
   name         String
   ownerId      String
-  user         User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  
+
+   user        User       @relation(fields: [ownerId], references: [id])
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   isOnboarded  Boolean    @default(false)
@@ -44,7 +46,7 @@ model Members {
   rolesId     String?
 
   user        User       @relation(fields: [userId], references: [id])
-  workspace   Workspaces @relation(fields: [workspaceId], references: [id])
+  workspace   Workspaces @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   
   Roles       Roles?     @relation(name: "RoleOnMember", fields: [rolesId], references: [id])
   createdAt   DateTime   @default(now())
@@ -57,7 +59,7 @@ model Roles {
   userId      String     // Added userId to associate a role with a user
 
   workspace   Workspaces @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)  // Added relationship to User
+  user        User       @relation(fields: [userId], references: [id]) // Added relationship to User
   members     Members[]  @relation(name: "RoleOnMember")
   rolePermissions RolePermission[]
   createdAt   DateTime   @default(now())
@@ -70,7 +72,7 @@ model Permission {
   workspaceId     String
   userId          String           // Added userId to track who is creating the permission
   workspace       Workspaces       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)  // Relation to User model
+   user        User       @relation(fields: [userId], references: [id])// Relation to User model
   rolePermissions RolePermission[]
   createdAt       DateTime         @default(now())
 }

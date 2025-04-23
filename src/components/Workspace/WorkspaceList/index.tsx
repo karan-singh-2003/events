@@ -33,6 +33,7 @@ const WorkspaceList: React.FC = () => {
   }
   return (
     <div className="relative mt-8">
+      
       {/* <div className="absolute -top-4 left-0 w-full h-8 bg-gradient-to-b from-[#000000] to-transparent z-10 pointer-events-none"></div> */}
 
       {Array.isArray(workspaces) && workspaces.length > 0 ? (

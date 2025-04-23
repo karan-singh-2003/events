@@ -1,10 +1,10 @@
 import useMutationData from './useMutationData'
 import useZodForm from './useZodForm'
-import { createWorkspace } from '../actions/workspace'
 import { createWorkspaceSchema } from '../schemas/createWorkspaceSchema'
 import { useState } from 'react'
 import { toggleAddWorkspaceModal } from '@/src/store/workspaceSlice'
 import { useDispatch } from 'react-redux'
+import  axios from 'axios'
 const useCreateWorkspace = () => {
   const dispatch = useDispatch()
   const [serverError, setServerError] = useState<string | null>(null)
@@ -12,7 +12,7 @@ const useCreateWorkspace = () => {
     mutationKey: ['createWorkspace'],
     mutationFn: async (data: { name: string }) => {
       console.log('Creating workspace with data:', data)
-      const response = await createWorkspace(data)
+      const response = await axios.post('/api/workspace/createworkspace', data)
       if (response.status !== 200) {
         throw new Error(
           response.data || 'An error occurred while creating workspace.'
