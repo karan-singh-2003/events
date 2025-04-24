@@ -18,6 +18,7 @@ import RolesModal from '@/src/components/RolesAndPermissions/RolesModal'
 import { useDispatch } from 'react-redux'
 import { toggleAddRolesModal } from '@/src/store/rolesSlice'
 import { useParams } from 'next/navigation'
+import PermissionList from '../../././../components/RolesAndPermissions/PermissionList'
 import RolesList from '@/src/components/RolesAndPermissions/RolesList'
 // import {
 //   PermissionsForWorkspace,
@@ -28,11 +29,12 @@ import WorkspacePermissions from '@/src/components/RolesAndPermissions/Workspace
 import CustomButton from '@/src/components/global/CustomButton'
 import { RootState } from '@/src/store/store'
 import { useSelector } from 'react-redux'
-
 const RolesAndPermissions = () => {
   const dispatch = useDispatch()
   const { workspaceId } = useParams()
   console.log('workspaceId in Roles and Permissions', workspaceId)
+
+
   const email = useSelector((state: RootState) => state.user.email)
   return (
     <div className="bg-[#222222] flex flex-col items-center min-h-screen w-full mx-auto  relative">
@@ -109,8 +111,7 @@ const RolesAndPermissions = () => {
             />
           ))}
         </div> */}
-
-
+ <PermissionList workspaceId={workspaceId} type="WORKSPACE" />
 
         
       </div>
@@ -123,33 +124,17 @@ const RolesAndPermissions = () => {
         </h1>
 
         {/* 🔹 Subheading & Permissions (line-by-line) */}
-        {/* <div className="flex flex-col gap-2">
-          {EventPermissions.map((permission, index) => (
-            <WorkspacePermissions
-              key={index}
-              permissionTitle={permission.title}
-              roles={permission.hasPermission}
-            />
-          ))}
-        </div> */}
-        sddsddsdsdsdbsadbasdbsahbdshadasdas
-      </div>
+        <PermissionList workspaceId={workspaceId} type="EVENT" />
+
+       </div>
       <hr className="border-b border-[#555353] my-8 w-[600px] mb-2" />
 
       <div className="flex flex-col w-[600px]  py-4">
         <h1 className="text-white text-2xl font-semibold ">Tasks Permission</h1>
 
-        {/* <div className="flex flex-col gap-2">
-          {TaskPermissions.map((permission, index) => (
-            <WorkspacePermissions
-              key={index}
-              permissionTitle={permission.title}
-              roles={permission.hasPermission}
-            />
-          ))}
-        </div> */}
-        nscasjccjcbcabcabchachhvac
-      </div>
+        <PermissionList workspaceId={workspaceId} type="TASK" />
+
+       </div>
       <CustomButton className="bg-[#635BFF] text-[18px]  hover:bg-[#635BFF]/80 w-full max-w-[620px] h-14 mb-28 mt-10 rounded-none">
         Continue
       </CustomButton>

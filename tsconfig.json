@@ -22,6 +22,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/api/auth/loggedme/route.js", "src/app/api/makeuser/route.js", "src/components/RolesAndPermissions/RolesModal.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/api/auth/loggedme/route.js", "src/app/api/makeuser/route.js", "src/components/RolesAndPermissions/RolesModal.tsx", "src/components/RolesAndPermissions/RolePermission.jsx"],
   "exclude": ["node_modules"]
 }
