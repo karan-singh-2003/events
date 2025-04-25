@@ -47,7 +47,7 @@ const WorkspaceCard = ({
             {members !== undefined && members !== null && (
               <div className="text-xs bg-[#214C00] text-[#6FFF00] py-0.5 px-3 my-0.5 rounded-full items-center justify-center flex w-fit">
                 <span className="mr-1 -mt-1 text-base">•</span>
-                <div className="text-center text-xs">{members} members</div>
+                <div className="text-center text-xs">{members} members   </div>
               </div>
             )}
           </div>

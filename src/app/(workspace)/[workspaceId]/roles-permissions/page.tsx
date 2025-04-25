@@ -18,7 +18,7 @@ import RolesModal from '@/src/components/RolesAndPermissions/RolesModal'
 import { useDispatch } from 'react-redux'
 import { toggleAddRolesModal } from '@/src/store/rolesSlice'
 import { useParams } from 'next/navigation'
-import PermissionList from '../../././../components/RolesAndPermissions/PermissionList'
+import PermissionList from '../../../../components/RolesAndPermissions/PermissionList'
 import RolesList from '@/src/components/RolesAndPermissions/RolesList'
 // import {
 //   PermissionsForWorkspace,
