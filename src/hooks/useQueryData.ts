@@ -13,6 +13,9 @@ export const useQueryData = (
   const { data, isPending, isFetched, refetch, isFetching } = useQuery({
     queryKey,
     queryFn,
+    staleTime: 1000 * 60 * 5, // 5 minutes — considers cache fresh for this time
+    refetchOnWindowFocus: false, // 👈 Don't re-fetch when switching tabs
+    
     enabled,
   })
 

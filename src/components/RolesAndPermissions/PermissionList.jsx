@@ -18,6 +18,8 @@ const PermissionList = ({ workspaceId, type }) => {
     queryKey: ['workspace-permissions', workspaceId, type],
     queryFn: () => getWorkspacePermissionsWithRoles(workspaceId, type),
     enabled: !!workspaceId && !!type, // Only fetch if both are provided
+    staleTime: 1000 * 60 * 5, // 5 minutes — considers cache fresh for this time
+    refetchOnWindowFocus: false, // 👈 Don't re-fetch when switching tabs
     onError: (error) => {
       console.error('Error fetching permissions:', error)
     }

@@ -1,4 +1,4 @@
-// mujhe type of permission connected workspace all show hongi with maped roles also 
+
 // only for postman 
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/src/lib/prisma'// Update path if needed

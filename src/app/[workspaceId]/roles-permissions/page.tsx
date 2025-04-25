@@ -101,16 +101,7 @@ const RolesAndPermissions = () => {
           Workspace Permission
         </h1>
 
-        {/* 🔹 Subheading & Permissions (line-by-line) */}
-        {/* <div className="flex flex-col gap-2">
-          {PermissionsForWorkspace.map((permission, index) => (
-            <WorkspacePermissions
-              key={index}
-              permissionTitle={permission.title}
-              roles={permission.hasPermission}
-            />
-          ))}
-        </div> */}
+      
  <PermissionList workspaceId={workspaceId} type="WORKSPACE" />
 
         
