@@ -12,8 +12,8 @@ interface InvitePeopleModalProps {
 interface InviteFormInputs {
   email: string
   role: string
-  MemberId: string,
-  
+  MemberId: string
+  message?: string
 }
 
 const roles = ['Admin', 'Member', 'Viewer']
@@ -43,7 +43,7 @@ const InvitePeopleModal: React.FC<InvitePeopleModalProps> = ({ isOpen, onClose }
       width="600px"
       className="rounded-none text-black max-w-[90vw]"
     >
-      <div className="flex flex-col h-full justify-between px-4 py-6">
+      <div className="flex flex-col h-full justify-between px-4 py-6 max-h-[90vh] overflow-y-auto">
         <div className="text-center text-white text-lg font-semibold">
           Invite People to Workspace
         </div>
@@ -51,7 +51,9 @@ const InvitePeopleModal: React.FC<InvitePeopleModalProps> = ({ isOpen, onClose }
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5 mt-6">
           {/* Email Field */}
           <div className="flex flex-col">
-            <label className="text-white mb-1 text-sm font-medium">Invite Member Email Address</label>
+            <label className="text-white mb-1 text-sm font-medium">
+              Invite Member Email Address
+            </label>
             <input
               type="email"
               placeholder="example@domain.com"
@@ -62,37 +64,35 @@ const InvitePeopleModal: React.FC<InvitePeopleModalProps> = ({ isOpen, onClose }
                   message: 'Enter a valid email address',
                 },
               })}
-              className="bg-[#383838] text-[#fff] placeholder:text-[#737272] px-4 py-3 rounded-none border border-[#444] focus:border-[#635BFF] outline-none"
+              className="bg-[#383838] text-white placeholder:text-[#737272] px-4 py-3 rounded-md border border-[#444] focus:border-[#635BFF] outline-none"
             />
             {errors.email && (
               <p className="text-[#FF3F3F] text-sm mt-1">{errors.email.message}</p>
             )}
           </div>
 
+          {/* Member ID Field */}
           <div className="flex flex-col">
             <label className="text-white mb-1 text-sm font-medium">Invite Member ID</label>
             <input
               type="text"
-              placeholder="Invite Member ID"
+              placeholder="Enter College ID"
               {...register('MemberId', {
                 required: 'ID is required',
-               
               })}
-              className="bg-[#383838] text-[#fff] placeholder:text-[#737272] px-4 py-3 rounded-none border border-[#444] focus:border-[#635BFF] outline-none"
+              className="bg-[#383838] text-white placeholder:text-[#737272] px-4 py-3 rounded-md border border-[#444] focus:border-[#635BFF] outline-none"
             />
             {errors.MemberId && (
-              <p className="text-[#FF3F3F] text-sm mt-1">{errors.MemberId?.message}</p>
+              <p className="text-[#FF3F3F] text-sm mt-1">{errors.MemberId.message}</p>
             )}
           </div>
-
-
 
           {/* Role Dropdown */}
           <div className="flex flex-col">
             <label className="text-white mb-1 text-sm font-medium">Select Role</label>
             <select
               {...register('role', { required: 'Please select a role' })}
-              className="bg-[#383838] text-white px-4 py-3 border border-[#444] rounded-none focus:border-[#635BFF] outline-none"
+              className="bg-[#383838] text-white px-4 py-3 border border-[#444] rounded-md focus:border-[#635BFF] outline-none"
             >
               <option value="">-- Select Role --</option>
               {roles.map((role) => (
@@ -106,19 +106,29 @@ const InvitePeopleModal: React.FC<InvitePeopleModalProps> = ({ isOpen, onClose }
             )}
           </div>
 
+          {/* Optional Message */}
+          <div className="flex flex-col">
+            <label className="text-white mb-1 text-sm font-medium">Optional Message</label>
+            <textarea
+              {...register('message')}
+              placeholder="Add a personal message (optional)"
+              rows={3}
+              className="bg-[#383838] text-white placeholder:text-[#737272] px-4 py-3 rounded-md border border-[#444] focus:border-[#635BFF] outline-none resize-none"
+            />
+          </div>
+
           {/* Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 mt-4">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 mt-4">
             <Button
               type="button"
               onClick={onClose}
-              className="bg-[#383838] hover:bg-[#333] text-white py-2.5 w-full lg:w-[200px] h-[50px] rounded-none text-base"
-            >
+                className="bg-[#383838] hover:bg-[#333] text-white py-2.5 w-full lg:w-[200px] lg:absolute lg:left-[42px] h-[50px] rounded-none text-base  lg:bottom-4 "
+             >
               Cancel
             </Button>
             <CustomButton
               disabled={!isValid}
-              
-              className="bg-[#635BFF]  hover:bg-[#635BFF]/80 text-white py-2.5 w-full lg:w-[200px] lg:right-[40px] lg:absolute h-[50px] rounded-none text-base"
+              className="bg-[#635BFF]  hover:bg-[#635BFF]/80 text-white py-2.5 w-full lg:w-[200px] lg:right-[40px] lg:absolute h-[50px] rounded-none text-base lg:bottom-4"
             >
               Send Invite
             </CustomButton>
