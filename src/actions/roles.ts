@@ -51,7 +51,7 @@ export const getWorkspaceAllRoles = async (workspaceId: string) => {
 }
 
 export const createRole = async (
-  data: { roles: { name: string }[]; workspaceId: string }
+  data: { name: string, workspaceId: string }
 ) => {
   try {
     const cookieStore = cookies()
@@ -71,51 +71,38 @@ export const createRole = async (
       return { status: 401, data: 'Unauthorized - missing user data' }
     }
 
-    if (!Array.isArray(data.roles) || data.roles.length === 0) {
-      return { status: 400, data: 'Roles array is required.' }
+    if (!data.name) {
+      return { status: 400, data: 'Role name is required.' }
     }
 
     if (!data.workspaceId) {
       return { status: 400, data: 'Workspace ID is required.' }
     }
 
-    const createdRoles = []
+    // 🔍 Check if role with same name already exists
+    const existingRole = await prisma.roles.findFirst({
+      where: {
+        name: data.name,
+        workspaceId: data.workspaceId,
+      },
+    })
 
-    for (const role of data.roles) {
-      // 🔍 Check if role with same name already exists in the workspace
-      const existingRole = await prisma.roles.findFirst({
-        where: {
-          name: role.name,
-          workspaceId: data.workspaceId,
-        },
-      })
-
-      if (existingRole) {
-        console.log(`⚠️ Role "${role.name}" already exists in this workspace.`)
-        continue // Skip this role creation
-      }
-
-      console.log('✅ Creating new role:', role.name)
-
-      const newRole = await prisma.roles.create({
-        data: {
-          name: role.name,
-          workspaceId: data.workspaceId,
-          userId: user.id,
-        },
-      })
-
-      createdRoles.push(newRole)
-    }
-
-    if (createdRoles.length === 0) {
+    if (existingRole) {
       return {
         status: 409,
-        data: 'No new roles created. All role names already exist.',
+        data: `Role "${data.name}" already exists in this workspace.`,
       }
     }
 
-    return { status: 200, data: createdRoles }
+    const newRole = await prisma.roles.create({
+      data: {
+        name: data.name,
+        workspaceId: data.workspaceId,
+        userId: user.id,
+      },
+    })
+
+    return { status: 200, data: newRole }
   } catch (error) {
     console.error('❌ Error creating role:', error)
     return { status: 500, data: 'Internal Server Error' }

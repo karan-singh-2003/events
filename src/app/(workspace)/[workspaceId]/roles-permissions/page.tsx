@@ -85,7 +85,7 @@ const RolesAndPermissions = () => {
         <RolesList />
 
         {/* Roles Modal */}
-        <RolesModal />
+        <RolesModal workspaceId={workspaceId}/>
 
         {/* Permissions Section */}
         <h4 className="text-[#D4D0D0] mt-11 font-poppins font-semibold text-[30px]">

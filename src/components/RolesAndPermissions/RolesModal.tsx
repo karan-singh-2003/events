@@ -5,24 +5,23 @@ import CustomButton from '../global/CustomButton'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '../../store/store'
 import { toggleAddRolesModal } from '../../store/rolesSlice'
-import BadgeInput from '../global/BadgeInput'
-import useCreateRole from '@/src/hooks/useCreateRole'
 import { ErrorMessage } from '@hookform/error-message'
-import { useParams } from 'next/navigation'
-const RolesModal = () => {
+import useCreateRole from '@/src/hooks/useCreateRole'
+
+const RolesModal = ({ workspaceId }: any) => {
   const dispatch = useDispatch()
   const isAddRolesModalOpen = useSelector(
     (state: RootState) => state.roles.isAddRolesModalOpen
   )
-  const params = useParams()
-  const workspaceId = params?.workspaceId as string
 
-  const { errors, onFormSubmit, isValid, watch, control } = useCreateRole(workspaceId)
-  const roles = watch('roles')
-  console.log('Roles:', roles)
-  console.log('Form Errors:', errors)
-
-  console.log('Is Form Valid?', isValid)
+  // ✅ Use your custom hook
+  const {
+    register,
+    errors,
+    onFormSubmit,
+    isValid,
+    isPending,
+  } = useCreateRole(workspaceId)
 
   return (
     <Modal
@@ -30,7 +29,7 @@ const RolesModal = () => {
       onClose={() => dispatch(toggleAddRolesModal())}
       height="450px"
       width="450px"
-      className="rounded-none text-black  "
+      className="rounded-none text-black"
     >
       <div className="flex flex-col h-full">
         <div className="text-[#7E7E7E] justify-center text-center font-semibold text-[17px]">
@@ -40,36 +39,33 @@ const RolesModal = () => {
         <hr className="border-[#313131] w-full my-3" />
 
         <div className="text-center text-white mt-3 mb-6 text-[18px] font-semibold">
-          Add your own custom roles
+          Add your own custom role
         </div>
 
-        <form className="flex flex-grow h-[44vh]" onSubmit={onFormSubmit}>
+        <form className="flex flex-grow h-[44vh] flex-col" onSubmit={onFormSubmit}>
           <div className="flex flex-col flex-grow">
-            <BadgeInput
-              type="role"
-              name="roles"
-              control={control}
-              placeholder="Add roles (e.g., admin, moderator)"
-              maxItems={5}
+            <input
+              {...register('name')} // ✅ important: Zod schema expects "name"
+              placeholder="Enter role (e.g., admin)"
+              className="bg-[#2D2D2D] text-white px-3 py-2 rounded-md focus:outline-none"
             />
             <ErrorMessage
-              errors={errors}
-              name="roles"
+              errors={errors} 
+              name="name"
               render={({ message }) => (
-                <p className="text-red-400 mt-2.5 ml-0  text-sm">
-                  {message === 'Required' ? '' : message}
-                </p>
+                <p className="text-red-400 mt-2.5 ml-0 text-sm">{message}</p>
               )}
             />
-            {/* ✅ Button Wrapper (Sticks to Bottom) */}
+
             <div className="mt-auto w-full flex justify-end pb-4">
-            <CustomButton
-  type="submit" 
-  className="bg-[#635BFF] hover:bg-[#635BFF]/80 text-white py-2.5 px-4 w-full h-[50px] rounded-none text-base"
->
-  Add Role to Workspace
-</CustomButton>
- </div>
+              <CustomButton
+                
+                disabled={!isValid || isPending}
+                className="bg-[#635BFF] hover:bg-[#635BFF]/80 text-white py-2.5 px-4 w-full h-[50px] rounded-none text-base"
+              >
+                {isPending ? 'Adding...' : 'Add Role to Workspace'}
+              </CustomButton>
+            </div>
           </div>
         </form>
       </div>
