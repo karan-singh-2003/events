@@ -154,7 +154,7 @@ export async function POST(req: NextRequest) {
             <p>${message || 'Click below to join immediately.'}</p>
             <a href="${inviteLink}" style="background:#28a745;color:#fff;padding:10px 20px;text-decoration:none;border-radius:5px;">Accept Invite</a>
           </div>
-        `,
+        `,  
       });
       console.log('Full Nodemailer send result:', sendResult)
       // Optionally save token to Redis for extra security (optional)

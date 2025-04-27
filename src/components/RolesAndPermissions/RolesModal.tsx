@@ -63,13 +63,13 @@ const RolesModal = () => {
             />
             {/* ✅ Button Wrapper (Sticks to Bottom) */}
             <div className="mt-auto w-full flex justify-end pb-4">
-              <CustomButton
-                disabled={!isValid}
-                className="bg-[#635BFF] hover:bg-[#635BFF]/80 text-white py-2.5 px-4 w-full h-[50px] rounded-none text-base"
-              >
-                Add Role to Workspace
-              </CustomButton>
-            </div>
+            <CustomButton
+  type="submit" 
+  className="bg-[#635BFF] hover:bg-[#635BFF]/80 text-white py-2.5 px-4 w-full h-[50px] rounded-none text-base"
+>
+  Add Role to Workspace
+</CustomButton>
+ </div>
           </div>
         </form>
       </div>
