@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
 
+import { Toaster } from 'react-hot-toast'
+
 import { Inter, Poppins } from 'next/font/google'
 import Providers from '../Providers/ReactQueryProvider'
 import ReduxProviders from '../Providers/ReduxProvider'
@@ -30,7 +32,13 @@ export default function RootLayout({
         className={`${inter.className} ${poppins.variable} font-poppins boldonse`}
       >
         <ReduxProviders>
-          <Providers>{children}</Providers>
+          <Providers>
+          <Toaster 
+        position="top-center" 
+        
+        
+      />
+            {children}</Providers>
         </ReduxProviders>
       </body>
     </html>

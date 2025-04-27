@@ -1,39 +1,27 @@
 import React from 'react'
-import { useForm } from 'react-hook-form'
 import Modal from '../../global/CustomModal'
 import CustomButton from '../../global/CustomButton'
 import { Button } from '../../ui/button'
+import useInviteMember from '@/src/hooks/useInvitemembers'
 
 interface InvitePeopleModalProps {
   isOpen: boolean
   onClose: () => void
+  workspaceId: any
 }
 
-interface InviteFormInputs {
-  email: string
-  role: string
-  MemberId: string
-  message?: string
-}
 
-const roles = ['Admin', 'Member', 'Viewer']
 
-const InvitePeopleModal: React.FC<InvitePeopleModalProps> = ({ isOpen, onClose }) => {
+const roles = ['admin', 'member', 'viewer', 'Hr']
+
+const InvitePeopleModal: React.FC<InvitePeopleModalProps> = ({ isOpen, onClose, workspaceId }) => {
   const {
     register,
-    handleSubmit,
-    formState: { errors, isValid },
-  } = useForm<InviteFormInputs>({ mode: 'onChange' })
-
-  const onSubmit = async (data: InviteFormInputs) => {
-    try {
-      console.log('Invite sent:', data)
-      // TODO: Call your invite API here
-      onClose()
-    } catch (err) {
-      console.error('Error:', err)
-    }
-  }
+    onFormSubmit,
+    errors,
+    isValid,
+    isPending,
+  } = useInviteMember(workspaceId)
 
   return (
     <Modal
@@ -48,7 +36,7 @@ const InvitePeopleModal: React.FC<InvitePeopleModalProps> = ({ isOpen, onClose }
           Invite People to Workspace
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5 mt-6">
+        <form onSubmit={onFormSubmit} className="flex flex-col gap-5 mt-6">
           {/* Email Field */}
           <div className="flex flex-col">
             <label className="text-white mb-1 text-sm font-medium">
@@ -57,17 +45,11 @@ const InvitePeopleModal: React.FC<InvitePeopleModalProps> = ({ isOpen, onClose }
             <input
               type="email"
               placeholder="example@domain.com"
-              {...register('email', {
-                required: 'Email is required',
-                pattern: {
-                  value: /^\S+@\S+$/i,
-                  message: 'Enter a valid email address',
-                },
-              })}
+              {...register('receiverEmail')}
               className="bg-[#383838] text-white placeholder:text-[#737272] px-4 py-3 rounded-md border border-[#444] focus:border-[#635BFF] outline-none"
             />
-            {errors.email && (
-              <p className="text-[#FF3F3F] text-sm mt-1">{errors.email.message}</p>
+            {errors.receiverEmail && (
+              <p className="text-[#FF3F3F] text-sm mt-1">{errors.receiverEmail.message}</p>
             )}
           </div>
 
@@ -77,13 +59,11 @@ const InvitePeopleModal: React.FC<InvitePeopleModalProps> = ({ isOpen, onClose }
             <input
               type="text"
               placeholder="Enter College ID"
-              {...register('MemberId', {
-                required: 'ID is required',
-              })}
+              {...register('receiverMemberId')}
               className="bg-[#383838] text-white placeholder:text-[#737272] px-4 py-3 rounded-md border border-[#444] focus:border-[#635BFF] outline-none"
             />
-            {errors.MemberId && (
-              <p className="text-[#FF3F3F] text-sm mt-1">{errors.MemberId.message}</p>
+            {errors.receiverMemberId && (
+              <p className="text-[#FF3F3F] text-sm mt-1">{errors.receiverMemberId.message}</p>
             )}
           </div>
 
@@ -91,7 +71,7 @@ const InvitePeopleModal: React.FC<InvitePeopleModalProps> = ({ isOpen, onClose }
           <div className="flex flex-col">
             <label className="text-white mb-1 text-sm font-medium">Select Role</label>
             <select
-              {...register('role', { required: 'Please select a role' })}
+              {...register('role')}
               className="bg-[#383838] text-white px-4 py-3 border border-[#444] rounded-md focus:border-[#635BFF] outline-none"
             >
               <option value="">-- Select Role --</option>
@@ -122,15 +102,16 @@ const InvitePeopleModal: React.FC<InvitePeopleModalProps> = ({ isOpen, onClose }
             <Button
               type="button"
               onClick={onClose}
-                className="bg-[#383838] hover:bg-[#333] text-white py-2.5 w-full lg:w-[200px] lg:absolute lg:left-[42px] h-[50px] rounded-none text-base  lg:bottom-4 "
-             >
+              className="bg-[#383838] hover:bg-[#333] text-white py-2.5 w-full lg:w-[200px] lg:absolute lg:left-[42px] h-[50px] rounded-none text-base lg:bottom-4"
+            >
               Cancel
             </Button>
             <CustomButton
-              disabled={!isValid}
-              className="bg-[#635BFF]  hover:bg-[#635BFF]/80 text-white py-2.5 w-full lg:w-[200px] lg:right-[40px] lg:absolute h-[50px] rounded-none text-base lg:bottom-4"
+              
+              disabled={!isValid || isPending}
+              className="bg-[#635BFF] hover:bg-[#635BFF]/80 text-white py-2.5 w-full lg:w-[200px] lg:right-[40px] lg:absolute h-[50px] rounded-none text-base lg:bottom-4"
             >
-              Send Invite
+              {isPending ? 'Sending...' : 'Send Invite'}
             </CustomButton>
           </div>
         </form>
