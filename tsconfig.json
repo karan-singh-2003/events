@@ -22,6 +22,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/api/auth/loggedme/route.js", "src/app/api/itsme/route.js", "src/components/RolesAndPermissions/RolesModal.tsx", "src/components/RolesAndPermissions/RolePermission.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/api/auth/loggedme/route.js", "src/app/api/itsme/route.js", "src/components/RolesAndPermissions/RolesModal.tsx", "src/components/RolesAndPermissions/RolePermission.jsx", "src/components/Workspace/workspaceFront/WorkspaceNavbar/WorkspaceSwitcher.tsx"],
   "exclude": ["node_modules"]
 }

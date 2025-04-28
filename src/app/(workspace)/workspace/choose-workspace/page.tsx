@@ -57,14 +57,7 @@ const ChooseWorkspace = () => {
   return (
     <div className="bg-[#222222] flex flex-col items-center h-screen relative w-full mx-auto overflow-hidden">
       {/* 🔹 Header */}
-      <div className="w-full flex justify-between items-center px-6 py-4">
-        <h1 className="text-[30px] font-bold text-white">
-          <Link href="/">events</Link>
-        </h1>
-        <div className="bg-amber-300 rounded-full py-2 px-2.5 text-black font-semibold">
-          {email?.slice(0, 2).toUpperCase()}
-        </div>
-      </div>
+    
 
       <h4 className="text-[#ffffff] font-semibold text-[30px] mt-8 mb-2">
         Choose Workspace

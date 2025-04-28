@@ -79,7 +79,7 @@ const LandingPage = () => {
             <CustomButton
               className="bg-[#070707] rounded-full text-[13px] px-5 hover:bg-[#575757]"
               onClick={() => {
-                window.location.href = '/workspace/choose-workspace'
+                window.location.href = '/workspace'
               }}
             >
               Continue to Workspace
