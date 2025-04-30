@@ -29,7 +29,7 @@ export const PermissionsForWorkspace = [
   {
     id: 1,
     type: 'WORKSPACE',
-    title: 'who can rename workspace',
+    title: 'who can edit delete workspace',
     hasPermission: ['admin', 'moderator', 'subadmin'],
   },
   {

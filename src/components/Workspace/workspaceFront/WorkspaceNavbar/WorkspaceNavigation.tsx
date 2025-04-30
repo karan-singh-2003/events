@@ -55,7 +55,7 @@ const routes = [
             <Link key={item.href} href={item.href}>
               <div
                 className={cn(
-                  'group flex items-center gap-2.5 p-2 rounded-md font-medium transition text-neutral-500',
+                  'group flex items-center gap-2.5 p-2 rounded-md font-medium transition text-white/70',
                   isActive
                     ? 'bg-white text-primary shadow-sm hover:opacity-100'
                     : 'hover:bg-black hover:text-white '

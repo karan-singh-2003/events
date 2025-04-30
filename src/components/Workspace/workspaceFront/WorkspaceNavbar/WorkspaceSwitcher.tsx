@@ -43,7 +43,7 @@ const {workspaceId} = useParams()
   return (
     <div className="flex flex-col gap-y-2">
       <div className="flex items-center justify-between">
-        <p className="text-sm uppercase text-gray-400 tracking-wider">Workspaces</p>
+        <p className="text-sm uppercase text-white/70 tracking-wider">Workspaces</p>
         <RiAddCircleFill
           className="cursor-pointer text-indigo-400 hover:text-indigo-500 size-5 transition-colors duration-200"
           onClick={() => router.push('/workspace/choose-workspace')}

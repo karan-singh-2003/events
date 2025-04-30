@@ -66,122 +66,82 @@ export const getUserAllWorkspaces = async () => {
 }
 
 
+export async function renameWorkspace({
+  name,
+  workspaceId,
+  
+}: {
+  name: string
+  workspaceId: string
+  
+}) {
 
-// export const createWorkspace = async (data: { name: string }) => {
-//   try {
-//     console.log('🛠️ Creating workspace:', data.name)
+  const cookieStore = cookies()
+    const sessionId = (await cookieStore).get('session_id')?.value
 
-//     const cookieStore = cookies()
-//     const sessionId = (await cookieStore).get('session_id')?.value
-//     if (!sessionId) {
-//       console.error('❌ No session ID in cookies.')
-//       return { status: 401, data: 'Unauthorized' }
-//     }
+  if (!sessionId) {
+    return { error: 'Unauthorized - No session ID', status: 401 }
+  }
 
-//     const sessionData = await redis.get(`session:${sessionId}`)
-//     if (!sessionData) {
-//       console.error('❌ Session not found in Redis.')
-//       return { status: 401, data: 'Unauthorized' }
-//     }
+  const sessionData = await redis.get(`session:${sessionId}`)
+  if (!sessionData) {
+    return { error: 'Unauthorized - No session data', status: 401 }
+  }
 
-//     const user = JSON.parse(sessionData)
-//     if (!user?.id || !user?.email) {
-//       console.error('❌ User info missing in session.')
-//       return { status: 401, data: 'Unauthorized' }
-//     }
+  const user = JSON.parse(sessionData)
+  if (!user?.id) {
+    return { error: 'Unauthorized - Invalid user data', status: 401 }
+  }
 
-//     // Check in DB
-//     const existingWorkspace = await prisma.workspaces.findFirst({
-//       where: { name: data.name },
-//     })
+  if (!name || !workspaceId) {
+    return { error: 'Missing name or workspace ID', status: 400 }
+  }
 
-//     if (existingWorkspace) {
-//       console.log('❌ Workspace already exists')
-//       return {
-//         status: 400,
-//         data: 'This workspace already exists. Try a different name.',
-//       }
-//     }
+  const member = await prisma.members.findFirst({
+    where: {
+      userId: user.id,
+      workspaceId,
+    },
+    include: {
+      Roles: true,
+    },
+  })
 
-//     // Transaction: create workspace + roles + permissions
-//     const createdWorkspace = await prisma.$transaction(async (tx) => {
-//       const workspace = await tx.workspaces.create({
-//         data: {
-//           name: data.name,
-//           ownerId: user.id,
-//         },
-//       })
+  if (!member || !member.Roles) {
+    return { error: 'You are not a member of this workspace', status: 403 }
+  }
 
-//       // Create roles
-//       const roleEntries = Object.values(defaultRoles)
-//       const roleRecords = await Promise.all(
-//         roleEntries.map((roleName) =>
-//           tx.roles.create({
-//             data: {
-//               name: roleName,
-//               workspaceId: workspace.id,
-//               userId: user.id,
-//             },
-//           })
-//         )
-//       )
+  const permission = await prisma.permission.findFirst({
+    where: {
+      title: 'who can rename workspace',
+      workspaceId,
+    },
+  })
 
-//       // Create permissions
-//       const permissionRecords = await Promise.all(
-//         PermissionsForWorkspace.map((perm) =>
-//           tx.permission.create({
-//             data: {
-//               title: perm.title,
-//               type: perm.type as PermissionType,
-//               workspaceId: workspace.id,
-//               userId: user.id,
-//             },
-//           })
-//         )
-//       )
+  if (!permission) {
+    return { error: 'Rename permission not found', status: 403 }
+  }
 
-//       // Map role-permission relationships
-//       const rolePermMappings = []
-//       for (const perm of permissionRecords) {
-//         const config = PermissionsForWorkspace.find((p) => p.title === perm.title)
-//         if (!config) continue
+  const hasPermission = await prisma.rolePermission.findFirst({
+    where: {
+      roleId: member.Roles.id,
+      permissionId: permission.id,
+      workspaceId,
+    },
+  })
 
-//         const rolesWithAccess = roleRecords.filter((r) =>
-//           config.hasPermission.includes(r.name)
-//         )
+  if (!hasPermission) {
+    return { error: 'You do not have permission to rename this workspace', status: 403 }
+  }
 
-//         for (const role of rolesWithAccess) {
-//           rolePermMappings.push(
-//             tx.rolePermission.create({
-//               data: {
-//                 roleId: role.id,
-//                 permissionId: perm.id,
-//                 workspaceId: workspace.id,
-//               },
-//             })
-//           )
-//         }
-//       }
+  const updatedWorkspace = await prisma.workspaces.update({
+    where: {
+      id: workspaceId,
+    },
+    data: {
+      name,
+    },
+  })
 
-//       await Promise.all(rolePermMappings)
-
-//       // Add user as admin member
-//       const adminRole = roleRecords.find((r) => r.name === defaultRoles.ADMIN)
-//       await tx.members.create({
-//         data: {
-//           userId: user.id,
-//           workspaceId: workspace.id,
-//           rolesId: adminRole?.id,
-//         },
-//       })
-
-//       return workspace
-//     })
-
-//     console.log('✅ Workspace created:', createdWorkspace.id)
-//     return { status: 200, data: 'Workspace created successfully' }
-//   } catch (error) {
-//     console.error('❌ Error in createWorkspace:', error)
-//     return { status: 500, data: 'Internal server error' }
-//   }
-// }
+  return { workspace: updatedWorkspace }
+}
