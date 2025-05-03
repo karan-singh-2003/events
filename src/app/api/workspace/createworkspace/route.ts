@@ -20,6 +20,7 @@ export enum Role {
   MEDIA_ADMIN = 'media admin',
   DATA_ENTRY = 'data entry',
   TEAM_MEMBER = 'team member',
+  MEMBER = 'member'
 }
 
 

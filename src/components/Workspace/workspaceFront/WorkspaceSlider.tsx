@@ -30,7 +30,7 @@ function Slider() {
 
   return (
     <>
-      <aside className="h-full bg-[#1A1A1A] border-r border-[#2c2c2c] p-4 w-full">
+      <aside className="h-full bg-[#131316] border-r border-[#2c2c2c] p-4 w-full">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2">
             <Image

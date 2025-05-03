@@ -55,7 +55,7 @@ const ChooseWorkspace = () => {
   if (loading) return <PageLoader />
 
   return (
-    <div className="bg-[#222222] flex flex-col items-center h-screen relative w-full mx-auto overflow-hidden">
+    <div className="bg-[#121212] flex flex-col items-center h-screen relative w-full mx-auto overflow-hidden">
       {/* 🔹 Header */}
     
 
