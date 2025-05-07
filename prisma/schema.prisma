@@ -11,58 +11,53 @@ model User {
   id           String       @id @default(uuid())
   name         String?
   email        String?      @unique
-  universityId String       @unique
   password     String
-  isAdmin      Boolean      @default(false)
   createdAt    DateTime     @default(now())
-  Workspaces   Workspaces[]
+  isAdmin      Boolean      @default(false)
+  universityId String       @unique
   Members      Members[]
-  Roles        Roles[]
   Permission   Permission[]
+  Roles        Roles[]
+  Workspaces   Workspaces[]
+  event       Event[]
 }
 
-
 model Workspaces {
-  id           String     @id @default(uuid())
-  name         String
-  ownerId      String
-  
-
-   user        User       @relation(fields: [ownerId], references: [id])
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  isOnboarded  Boolean    @default(false)
-  
-  members      Members[]
-  roles        Roles[]
-  permissions  Permission[]
+  id              String           @id @default(uuid())
+  name            String
+  ownerId         String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  isOnboarded     Boolean          @default(false)
+  members         Members[]
+  permissions     Permission[]
   rolePermissions RolePermission[]
+  roles           Roles[]
+  user            User             @relation(fields: [ownerId], references: [id])
+  event         Event[]
 }
 
 model Members {
   id          String     @id @default(uuid())
   userId      String
   workspaceId String
+  createdAt   DateTime   @default(now())
   rolesId     String?
-
+  Roles       Roles?     @relation("RoleOnMember", fields: [rolesId], references: [id])
   user        User       @relation(fields: [userId], references: [id])
   workspace   Workspaces @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  
-  Roles       Roles?     @relation(name: "RoleOnMember", fields: [rolesId], references: [id])
-  createdAt   DateTime   @default(now())
 }
 
 model Roles {
-  id          String     @id @default(uuid())
-  name        String
-  workspaceId String
-  userId      String     // Added userId to associate a role with a user
-
-  workspace   Workspaces @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user        User       @relation(fields: [userId], references: [id]) // Added relationship to User
-  members     Members[]  @relation(name: "RoleOnMember")
+  id              String           @id @default(uuid())
+  name            String
+  workspaceId     String
+  createdAt       DateTime         @default(now())
+  userId          String
+  members         Members[]        @relation("RoleOnMember")
   rolePermissions RolePermission[]
-  createdAt   DateTime   @default(now())
+  user            User             @relation(fields: [userId], references: [id])
+  workspace       Workspaces       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
 model Permission {
@@ -70,28 +65,61 @@ model Permission {
   title           String
   type            PermissionType
   workspaceId     String
-  userId          String           // Added userId to track who is creating the permission
-  workspace       Workspaces       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-   user        User       @relation(fields: [userId], references: [id])// Relation to User model
-  rolePermissions RolePermission[]
   createdAt       DateTime         @default(now())
+  userId          String
+  user            User             @relation(fields: [userId], references: [id])
+  workspace       Workspaces       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  rolePermissions RolePermission[]
 }
 
 model RolePermission {
-  id            String      @id @default(uuid())
-  roleId        String
-  permissionId  String
-  workspaceId   String
-
-  role          Roles       @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permission    Permission  @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-  workspace     Workspaces  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-
-  createdAt     DateTime    @default(now())
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  roleId       String
+  permissionId String
+  workspaceId  String
+  createdAt    DateTime   @default(now())
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role         Roles      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  workspace    Workspaces @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
 enum PermissionType {
   WORKSPACE
   EVENT
   TASK
+}
+
+// Enums for better type safety and cleaner logic
+enum ProjectStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  BLOCKED
+}
+
+enum ProjectPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model Event {
+  id          String          @id @default(uuid())
+  name        String
+  description String
+  status      ProjectStatus   @default(TODO)
+  priority    ProjectPriority @default(MEDIUM)
+  deadline    DateTime?
+
+  workspaceId String
+  userId      String
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  workspace   Workspaces      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+   @@map("Event") /// 👈 Map this Prisma model to the existing "Project" table in PostgreSQL
 }

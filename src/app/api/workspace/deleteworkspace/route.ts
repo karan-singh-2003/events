@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     // Step 4: Delete the workspace
     const deletedWorkspace = await prisma.workspaces.delete({
       where: {
-        id: workspaceId,
+        id: workspaceId
       },
     })
 

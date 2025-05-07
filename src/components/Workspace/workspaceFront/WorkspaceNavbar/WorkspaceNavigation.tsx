@@ -7,6 +7,8 @@ import React from 'react';
 import Link from 'next/link';
 import { cn } from '@/src/lib/utils';
 import { useParams } from 'next/navigation';
+import { Separator } from '@/src/components/ui/separator';
+import EventModalTriggerButton from '../../EventModalTriggerButton/Index';
 
 function Navigation() {
   const { workspaceId } = useParams();
@@ -46,7 +48,7 @@ function Navigation() {
     }
   ];
 
-  return (
+  return (<>
     <ul className="flex flex-col">
       {routes.map((item) => {
         const isActive = false; // TODO: Add logic using `usePathname` if needed
@@ -57,10 +59,10 @@ function Navigation() {
               className={cn(
                 'group flex items-center gap-2.5 p-2 rounded-md font-medium transition text-white/70',
                 isActive
-                  ? 'bg-white text-primary shadow-sm hover:opacity-100'
-                  : 'hover:bg-black hover:text-white '
+                ? 'bg-white text-primary shadow-sm hover:opacity-100'
+                : 'hover:bg-black hover:text-white '
               )}
-            >
+              >
               <Icon className="size-5 group-hover:text-white" />
               {item.label}
             </div>
@@ -68,6 +70,15 @@ function Navigation() {
         );
       })}
     </ul>
+    <Separator className='m-2 bg-[#505152]'/>
+    <div className='flex  justify-between'>
+    <div className='flex text-sm uppercase text-white/70 tracking-wider  '>
+      Event
+    </div>
+    <div><EventModalTriggerButton/></div>
+
+    </div>
+      </>
   );
 }
 

@@ -1,0 +1,75 @@
+'use client';
+
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
+
+import { createEventSchema, CreateEventInput } from '../schemas/createEventSchema';
+
+const useCreateEvent = (workspaceId: string) => {
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [deadline, setDeadline] = useState<Date | undefined>();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    reset,
+  } = useForm<CreateEventInput>({
+    resolver: zodResolver(createEventSchema),
+    mode: 'onChange',
+  });
+
+  const {
+    mutate,
+    isPending,
+    isSuccess,
+    data,
+  } = useMutation({
+    mutationKey: ['CreateEvent'],
+    mutationFn: async (formData: CreateEventInput) => {
+      const payload = { ...formData, deadline, workspaceId };
+      const response = await axios.post('/api/events/createevents', payload);
+      return response.data;
+    },
+    onSuccess: () => {
+      toast.success('Event created successfully!');
+      reset();
+      setDeadline(undefined);
+    },
+    onError: (error: any) => {
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Something went wrong';
+      setServerError(errorMessage);
+      toast.error(`Error: ${errorMessage}`);
+    },
+  });
+
+  const onFormSubmit = handleSubmit((formData) => {
+    if (!deadline) {
+      toast.error('Please select a deadline.');
+      return;
+    }
+    mutate(formData);
+  });
+
+  return {
+    register,
+    errors,
+    isValid,
+    onFormSubmit,
+    isPending,
+    isSuccess,
+    deadline,
+    setDeadline,
+    serverError,
+    data,
+  };
+};
+
+export default useCreateEvent;

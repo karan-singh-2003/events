@@ -1,0 +1,60 @@
+// src/hooks/useCreateEvent.ts
+'use client';
+
+import { useState } from 'react';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { createEventSchema, CreateEventInput } from '../schemas/createEventSchema';
+
+const useCreateEvent = (workspaceId: string) => {
+  const [deadline, setDeadline] = useState<Date | undefined>();
+  const [serverError, setServerError] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    reset,
+  } = useForm<CreateEventInput>({
+    resolver: zodResolver(createEventSchema),
+    mode: 'onChange',
+  });
+
+  const [isPending, setIsPending] = useState(false);
+
+  const onFormSubmit = handleSubmit(async (formData) => {
+    if (!deadline) {
+      toast.error('Please select a deadline.');
+      return;
+    }
+
+    try {
+      setIsPending(true);
+      const payload = { ...formData, deadline, workspaceId };
+      const response = await axios.post('/api/events/createevents', payload);
+
+    
+    } catch (error: any) {
+      setServerError(error.message);
+      toast.error(error.message);
+    } finally {
+      setIsPending(false);
+    }
+  });
+
+  return {
+    register,
+    errors,
+    onFormSubmit,
+    isValid,
+    isPending,
+    deadline,
+    setDeadline,
+    serverError,
+  };
+};
+
+export default useCreateEvent;

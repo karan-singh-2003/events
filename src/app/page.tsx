@@ -9,13 +9,34 @@ import { useDispatch, useSelector } from 'react-redux'
 import { toggleSidebar } from '../store/sidebarSlice'
 import { RootState } from '../store/store'
 import { setUserEmail, setUserIsAdmin } from '../store/userSlice'
+import { useRouter } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
 
 const LandingPage = () => {
   const dispatch = useDispatch()
   const [Email, setEmail] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const router = useRouter();
+  const {
+    data: Workspaces = { data: [] },
+    isPending:worspacePending,
+    isFetching,
+  } = useQuery({
+    queryKey: ['workspaces'],
+    queryFn: async () => {
+      const response = await axios.get('/api/workspace/getworkspaces')
+      return response.data
+    },
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+    refetchOnWindowFocus: false,
+  })
+
+const workspaces: any[] = Workspaces?.data ?? []
 
   useEffect(() => {
+
     const fetchSession = async () => {
       try {
         const res = await fetch('/api/auth/session')
@@ -46,7 +67,9 @@ const LandingPage = () => {
 
   if (loading) {
     return <PageLoader />
-  }
+  } 
+  
+  
 
   return (
     <div className="relative flex flex-col items-center h-screen w-[1200px] mx-auto bg-white">
@@ -79,8 +102,14 @@ const LandingPage = () => {
             <CustomButton
               className="bg-[#070707] rounded-full text-[13px] px-5 hover:bg-[#575757]"
               onClick={() => {
-                window.location.href = '/workspace'
-              }}
+                const fallbackWorkspaceId = workspaces[0]?.workspaceId
+
+      if (fallbackWorkspaceId) {
+        router.push(`/workspace/${fallbackWorkspaceId}`)
+      } else {
+        router.push(`/`) // fallback route if no workspaces left
+      }
+                     }}
             >
               Continue to Workspace
             </CustomButton>

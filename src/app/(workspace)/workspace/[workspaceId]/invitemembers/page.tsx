@@ -10,7 +10,7 @@ const Page = () => {
   const { workspaceId } = useParams()
   
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#222222] text-white">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#121212] text-white">
       <h1 className="text-3xl mb-4">Let`s Add People in Workspace</h1>
       <CustomButton
         onClick={() => setIsModalOpen(true)}
