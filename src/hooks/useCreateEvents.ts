@@ -3,13 +3,15 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
+import { QueryClient, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
 import { createEventSchema, CreateEventInput } from '../schemas/createEventSchema';
 
 const useCreateEvent = (workspaceId: string) => {
+    const queryClient = useQueryClient();
+
   const [serverError, setServerError] = useState<string | null>(null);
   const [deadline, setDeadline] = useState<Date | undefined>();
 
@@ -39,6 +41,7 @@ const useCreateEvent = (workspaceId: string) => {
       toast.success('Event created successfully!');
       reset();
       setDeadline(undefined);
+      queryClient.invalidateQueries({ queryKey: ['events', workspaceId] }); 
     },
     onError: (error: any) => {
       const errorMessage =

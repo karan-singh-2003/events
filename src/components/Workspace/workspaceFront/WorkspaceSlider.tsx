@@ -8,6 +8,7 @@ import WorkspaceNavigation from './WorkspaceNavbar/WorkspaceNavigation'
 import WorkspaceSwitcher from './WorkspaceNavbar/WorkspaceSwitcher'
 import { Button } from '../../ui/button'
 import { Separator } from '../../ui/separator'
+import EventSwitcher from '../../Event/getallEventSwitcher/EventSwitcher'
 
 function Slider() {
   const sentence = {
@@ -84,6 +85,7 @@ function Slider() {
         <Separator className="m-2 bg-[#505152] " />
 
         <WorkspaceNavigation />
+        <EventSwitcher/>
       </aside>
     </>
   )

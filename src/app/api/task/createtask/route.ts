@@ -2,11 +2,10 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '../../../../lib/prisma';
 import redis from '../../../../lib/redis';
-
 export async function POST(req: Request) {
   try {
     // Step 1: Parse request body
-    const { name, workspaceId, deadline, description, status, priority } = await req.json();
+    const { title, eventId, workspaceId, deadline, description, status, priority, assigningMemberId } = await req.json();
 
     // Step 2: Validate session
     const cookieStore = cookies();
@@ -26,9 +25,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Unauthorized - Invalid user data' }, { status: 401 });
     }
 
-    // Step 3: Validate project data
-    if (!name || !workspaceId || !deadline || !description || !status || !priority) {
-      return NextResponse.json({ message: 'Missing required project fields' }, { status: 400 });
+    // Step 3: Validate task data
+    if (!title || !deadline || !description || !status || !priority) {
+      return NextResponse.json({ message: 'Missing required task fields' }, { status: 400 });
+    }
+
+    // Check if task already exists
+    const existingTask = await prisma.task.findFirst({
+      where: {
+        title,
+      },
+    });
+
+    if (existingTask) {
+      return NextResponse.json({ message: 'Task with this title already exists' }, { status: 400 });
     }
 
     // Step 4: Check if user is a member of the workspace
@@ -46,7 +56,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'You are not a member of this workspace' }, { status: 403 });
     }
 
-    // Step 5: Check if the user has permission to create a project
+    // Step 5: Check if user has permission to create tasks
     const permission = await prisma.permission.findFirst({
       where: {
         title: "who can create/edit/delete events",
@@ -55,10 +65,9 @@ export async function POST(req: Request) {
     });
 
     if (!permission) {
-      return NextResponse.json({ message: 'Permission to create project not found' }, { status: 403 });
+      return NextResponse.json({ message: 'Permission to create task not found' }, { status: 403 });
     }
 
-    // Check if the user's role has the necessary permission
     const hasPermission = await prisma.rolePermission.findFirst({
       where: {
         roleId: member.Roles.id,
@@ -68,33 +77,34 @@ export async function POST(req: Request) {
     });
 
     if (!hasPermission) {
-      return NextResponse.json({ message: 'You do not have permission to create a project in this workspace' }, { status: 403 });
+      return NextResponse.json({ message: 'You do not have permission to create tasks in this workspace' }, { status: 403 });
     }
 
-    // Step 6: Create the project in the database
-    const newProject = await prisma.event.create({
+    // Step 6: Create the task in the database
+    const newTask = await prisma.task.create({
       data: {
-        name,
+        title,
         description,
         deadline: new Date(deadline),
         status,
         priority,
-        workspaceId,
-        userId: user.id, // Assigning user as the creator
+        assigningMemberId:  '14a06758-156a-449b-8305-9342213b2a38',
+        userId: user.id, // Creator of the task
+        eventId, // Associated event ID
       },
     });
 
-    // Step 7: Store the project in Redis
-    await redis.set(`project:${newProject.id}`, JSON.stringify(newProject), 'EX', 3600); // Store for 1 hour
+    // Step 7: Store the task in Redis
+    await redis.set(`task:${newTask.id}`, JSON.stringify(newTask), 'EX', 3600); // Store for 1 hour
 
-    // Step 8: Return the created project details in the response
+    // Step 8: Return success response
     return NextResponse.json(
-      { message: 'Project created successfully', project: newProject },
+      { message: 'Task created successfully', task: newTask },
       { status: 201 }
     );
 
   } catch (err) {
-    console.error('Error creating project:', err);
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+    console.error('Error creating task:', err);
+    return NextResponse.json({ message: err || 'Internal server error' }, { status: 500 });
   }
 }

@@ -64,7 +64,7 @@ export async function GET(req: Request) {
     await redis.set(`events:${workspaceId}`, JSON.stringify(events), 'EX', 600);
 
     // Step 7: Return events
-    return NextResponse.json(events, { status: 200 });
+    return NextResponse.json({data: events }, { status: 200 });
 
   } catch (err) {
     console.error('Error fetching events:', err);

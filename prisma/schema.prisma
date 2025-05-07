@@ -19,7 +19,8 @@ model User {
   Permission   Permission[]
   Roles        Roles[]
   Workspaces   Workspaces[]
-  event       Event[]
+  event   Event[]
+  task  Task[]
 }
 
 model Workspaces {
@@ -29,12 +30,12 @@ model Workspaces {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   isOnboarded     Boolean          @default(false)
+  event           Event[]
   members         Members[]
   permissions     Permission[]
   rolePermissions RolePermission[]
   roles           Roles[]
   user            User             @relation(fields: [ownerId], references: [id])
-  event         Event[]
 }
 
 model Members {
@@ -46,6 +47,7 @@ model Members {
   Roles       Roles?     @relation("RoleOnMember", fields: [rolesId], references: [id])
   user        User       @relation(fields: [userId], references: [id])
   workspace   Workspaces @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  task      Task[]
 }
 
 model Roles {
@@ -83,13 +85,52 @@ model RolePermission {
   workspace    Workspaces @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
+model Event {
+  id          String    @id @default(uuid())
+  name        String
+  workspaceId String
+  userId      String
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  workspace   Workspaces @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task        Task[]
+  @@map("Event") // Map this Prisma model to the existing "Event" table in PostgreSQL
+}
+
+
+model Task {
+  id               String      @id @default(uuid())
+  title            String
+  description      String
+  status           ProjectStatus @default(TODO)
+  priority         ProjectPriority @default(MEDIUM)
+  deadline         DateTime?
+  userId           String      // Creator of the task (User ID)
+  assigningMemberId String     // Assigned Member ID (from Members table)
+  eventId          String
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  user             User        @relation(fields: [userId], references: [id])
+  assigningMember  Members     @relation( fields: [assigningMemberId], references: [id])
+  event            Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@map("Task")
+}
+
+
+
 enum PermissionType {
   WORKSPACE
   EVENT
   TASK
 }
 
-// Enums for better type safety and cleaner logic
 enum ProjectStatus {
   TODO
   IN_PROGRESS
@@ -102,24 +143,4 @@ enum ProjectPriority {
   MEDIUM
   HIGH
   CRITICAL
-}
-
-model Event {
-  id          String          @id @default(uuid())
-  name        String
-  description String
-  status      ProjectStatus   @default(TODO)
-  priority    ProjectPriority @default(MEDIUM)
-  deadline    DateTime?
-
-  workspaceId String
-  userId      String
-
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-
-  workspace   Workspaces      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-   @@map("Event") /// 👈 Map this Prisma model to the existing "Project" table in PostgreSQL
 }
