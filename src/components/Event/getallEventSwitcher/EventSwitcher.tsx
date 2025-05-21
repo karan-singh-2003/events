@@ -1,43 +1,3 @@
-// 'use client';
-
-// import { useState } from 'react';
-// import { useQuery } from '@tanstack/react-query';
-// import { useParams } from 'next/navigation';
-
-// const fetchEvents = async (workspaceId: any) => {
-//   const res = await fetch(`/api/events/getallevents?workspaceId=${workspaceId}`);
-//   const data = await res.json();
-//   return Array.isArray(data) ? data : [];
-// };
-
-// export default function EventNameSwitcher() {
-//   const {workspaceId} = useParams()
-//   const { data: events = [], isLoading } = useQuery({
-//     queryKey: ['events', workspaceId],
-//     queryFn: () => fetchEvents(workspaceId),
-//     enabled: !!workspaceId,
-//   });
-
-//   return (
-//     <div style={{ padding: '20px' }}>
-//       <h2>Switch Workspace</h2>
-//       <div style={{ marginBottom: '10px' }}>
-//       </div>
-
-//       <h3>Event Names:</h3>
-//       {isLoading ? (
-//         <p>Loading...</p>
-//       ) : (
-//         <ul>
-//           {events.map((event: any) => (
-//             <li key={event.id}>{event.name}</li>
-//           ))}
-//         </ul>
-//       )}
-//     </div>
-//   );
-// }
-
 'use client';
 
 import React from 'react';
@@ -64,10 +24,13 @@ function EventSwitcher() {
     ['events', workspaceId],
     async () => {
       const res = await fetch(`/api/events/getallevents?workspaceId=${workspaceId}`);
-      const data = await res.json();
+      const json = await res.json();
+
+      // ✅ Fix: correctly extract data from JSON response
+      const data = json?.data;
       return Array.isArray(data) ? data : [];
     },
-    true
+    true // enabled flag
   );
 
   const onSelect = (id: string) => {
@@ -91,10 +54,6 @@ function EventSwitcher() {
 
         <SelectContent
           className="bg-[#2C2C2C] text-gray-200 border border-[#3a3a3a] max-h-60 overflow-y-auto"
-          style={{
-            maxHeight: '200px',  // You can adjust this based on how much space you want for the dropdown
-            overflowY: 'auto',   // Enables vertical scrolling
-          }}
         >
           {events.map((event: any) => (
             <SelectItem
