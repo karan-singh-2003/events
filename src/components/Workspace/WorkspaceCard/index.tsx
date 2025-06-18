@@ -21,11 +21,7 @@ const WorkspaceCard = ({
   const router = useRouter()
   const bgColor = getColorForString(workspaceName)
   const handleRedirectToWorkspace = () => {
-    if (!isOnboarding) {
-      router.push(`/${url}/roles-permissions`)
-    } else {
-      router.push(`/o/${url}`)
-    }
+    router.replace(`/${url}/`)
   }
   return (
     <div className="flex items-center justify-between mt-1.5 py-3 px-4 bg-transparent rounded-none hover:bg-[#292929] transition-all duration-200">

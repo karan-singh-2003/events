@@ -9,12 +9,11 @@ import { toast } from 'react-hot-toast';
 
 import { createEventSchema, CreateEventInput } from '../schemas/createEventSchema';
 
-const useCreateEvent = (workspaceId: string) => {
+const useCreateEvent = (workspaceId: any) => {
     const queryClient = useQueryClient();
 
   const [serverError, setServerError] = useState<string | null>(null);
-  const [deadline, setDeadline] = useState<Date | undefined>();
-
+ 
   const {
     register,
     handleSubmit,
@@ -33,14 +32,13 @@ const useCreateEvent = (workspaceId: string) => {
   } = useMutation({
     mutationKey: ['CreateEvent'],
     mutationFn: async (formData: CreateEventInput) => {
-      const payload = { ...formData, deadline, workspaceId };
+      const payload = { ...formData, workspaceId };
       const response = await axios.post('/api/events/createevents', payload);
       return response.data;
     },
     onSuccess: () => {
       toast.success('Event created successfully!');
       reset();
-      setDeadline(undefined);
       queryClient.invalidateQueries({ queryKey: ['events', workspaceId] }); 
     },
     onError: (error: any) => {
@@ -54,10 +52,7 @@ const useCreateEvent = (workspaceId: string) => {
   });
 
   const onFormSubmit = handleSubmit((formData) => {
-    if (!deadline) {
-      toast.error('Please select a deadline.');
-      return;
-    }
+    
     mutate(formData);
   });
 
@@ -68,8 +63,6 @@ const useCreateEvent = (workspaceId: string) => {
     onFormSubmit,
     isPending,
     isSuccess,
-    deadline,
-    setDeadline,
     serverError,
     data,
   };

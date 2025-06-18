@@ -40,11 +40,12 @@ const WorkspaceList: React.FC = () => {
         <div className="max-h-[400px] overflow-y-auto space-y-2 scrollbar-hide dark-scrollbar relative w-[470px]">
           {workspaces.map((workspace, index) =>
             workspace ? (
+              
               <WorkspaceCard
                 key={index}
                 workspaceName={workspace.workspaceName ?? ''}
                 members={workspace.membersCount ?? 0}
-                url={workspace.workspaceId ?? ''}
+                url={workspace.workspaceId} 
                 isOnboarding={workspace.isOnboarded ?? false}
                 className="h-12 w-12 rounded-full text-2xl font-extrabold text-[#313131]"
               />

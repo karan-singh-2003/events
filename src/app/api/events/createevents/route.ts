@@ -33,7 +33,8 @@ export async function POST(req: Request) {
     // Check if task already exists
     const existingEvent = await prisma.event.findFirst({
       where: {
-        name
+        name,
+        workspaceId
       },
     });
 
@@ -90,12 +91,16 @@ export async function POST(req: Request) {
       },
     });
 
-    // Step 7: Store the task in Redis
-    await redis.set(`event:${newEvent.id}`, JSON.stringify(newEvent), 'EX', 3600); // Store for 1 hour
+    
+     // Step 8: Cache individual event in Redis
+    await redis.set(`event:${newEvent.id}`, JSON.stringify(newEvent), 'EX', 3600); // Cache for 1 hour
 
-    // Step 8: Return success response
+    // Step 9: Invalidate cached events list for the workspace
+    await redis.del(`events:${workspaceId}`);
+
+    // Step 10: Return success response
     return NextResponse.json(
-      { message: 'event created successfully', task: newEvent },
+      { message: 'Event created successfully', event: newEvent },
       { status: 201 }
     );
 

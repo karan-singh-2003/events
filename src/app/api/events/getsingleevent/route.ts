@@ -7,12 +7,13 @@ import redis from '../../../../lib/redis';
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const workspaceId = searchParams.get('workspaceId');
-
+    const workspaceId = searchParams?.get('workspaceId')
+    const eventId = searchParams?.get('eventId')
     // Step 1: Validate workspaceId
-    if (!workspaceId) {
+    if (!workspaceId || !eventId) {
       return NextResponse.json({ message: 'workspaceId is required' }, { status: 400 });
     }
+ 
 
     const cookieStore = cookies();
     const sessionId = (await cookieStore).get('session_id')?.value;
@@ -51,20 +52,18 @@ export async function GET(req: Request) {
     }
 
     // Step 5: Fetch from DB
-    const events = await prisma.event.findMany({
+    const events = await prisma.event.findFirst({
       where: {
-        workspaceId,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      workspaceId,
+      id:eventId
+      }
     });
 
     // Step 6: Cache result in Redis for 10 minutes
     await redis.set(`events:${workspaceId}`, JSON.stringify(events), 'EX', 600);
 
     // Step 7: Return events
-    return NextResponse.json(events , { status: 200 });
+    return NextResponse.json({data: events }, { status: 200 });
 
   } catch (err) {
     console.error('Error fetching events:', err);

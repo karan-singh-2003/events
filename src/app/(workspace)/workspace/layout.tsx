@@ -5,6 +5,10 @@ import WorkspaceSlider from '@/src/components/Workspace/workspaceFront/Workspace
 
 import React from 'react'
 
+
+import { NuqsAdapter} from 'nuqs/adapters/next'
+
+
 interface DashboardlayoutProps {
     children:React.ReactNode
 }
@@ -21,8 +25,10 @@ function layout({children}:DashboardlayoutProps) {
 <div className='mx-auto max-w-screen-2xl h-full '>
     <WorkspaceNavbar/>
     <main className='  h-full bg-[#121212] py-6 px-6 flex flex-col'>
+ <NuqsAdapter>
 
 {children}
+ </NuqsAdapter>
     </main>
 </div>
             </div>

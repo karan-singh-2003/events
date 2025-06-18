@@ -66,6 +66,7 @@ function WorkspacesSwitcher() {
                 className="hover:bg-indigo-500/20 hover:text-indigo-300 cursor-pointer transition-colors duration-150 rounded-md"
               >
                 {workspace.workspaceName} 
+                {/* {workspace.memberCount} */}
               </SelectItem>
             ))}
         </SelectContent>

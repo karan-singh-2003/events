@@ -2,7 +2,7 @@ import React from 'react'
 
 function page() {
   return (
-    <div className=''>Workspace page</div>
+    <div className='text-white'>Workspace page</div>
   )
 }
 
