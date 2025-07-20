@@ -44,7 +44,7 @@ function Workspacesettingmain() {
   return (<>
   
     <div className='flex  m-4 mt-8  justify-between'> 
-        <div className='text-white/90'>
+        <div className='text-black'>
             Remove your workspace 
         </div>
         <div> <Button className='cursor-pointer px-[8px] py-2 bg-red-700'

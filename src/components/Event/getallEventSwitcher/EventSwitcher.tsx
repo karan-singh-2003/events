@@ -62,15 +62,15 @@ export default function EventSwitcher() {
       <Select onValueChange={onSelect} value={selectedEvent?.id}>
         <Tooltip.Root delayDuration={200}>
           <Tooltip.Trigger asChild>
-            <SelectTrigger className="w-[32px] font-medium p-2 text-gray-900 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            <SelectTrigger className="w-[30px]  h-[30px] ml-1 font-medium p-2 text-gray-900 S shadow-sm focus:ring-1 focus:ring-indigo-400 focus:border-indigo-300 border-[0.8px] border-[#a1a1a1]">
               <div className="flex items-center gap-3">
                 {selectedEvent ? (
-                  <div className="flex relative right-1 items-center justify-center h-[22px] w-[25px] rounded-full bg-indigo-500 text-white font-semibold">
+                  <div className="flex relative right-1 items-center justify-center h-[22px] w-[25px] rounded-full  text-gray-700 font-semibold">
                     {selectedEvent.name?.[0]?.toUpperCase()}
                   </div>
                 ) : (
-                  <div className="flex relative right-1 items-center justify-center w-[24px] h-[28px] rounded-full">
-                    📅
+                  <div className="flex relative right-1 items-center justify-center w-[19px] h-[19px] rounded-full">
+                    🎪
                   </div>
                 )}
               </div>
@@ -81,10 +81,10 @@ export default function EventSwitcher() {
           <Tooltip.Content
             side="right"
             sideOffset={8}
-            className="z-50 rounded-md bg-black px-3 py-1.5 text-xs text-white shadow-md"
+            className="z-50 rounded-md bg-white px-3 py-1.5 text-xs text-black shadow-md"
           >
             {selectedEvent?.name || 'Select event'}
-            <Tooltip.Arrow className="fill-black" />
+            <Tooltip.Arrow className="fill-white" />
           </Tooltip.Content>
         </Tooltip.Root>
 
@@ -93,11 +93,9 @@ export default function EventSwitcher() {
             <SelectItem
               key={event.id}
               value={event.id}
-              className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 cursor-pointer rounded-md transition"
+              className="flex items-center gap-3 px-2 py-2 hover:bg-gray-100 cursor-pointer rounded-md transition"
             >
-              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-500 text-white font-semibold">
-                {event.name?.[0]?.toUpperCase()}
-              </div>
+             
               <span className="text-sm text-gray-900 font-medium">{event.name}</span>
             </SelectItem>
           ))}

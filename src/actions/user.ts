@@ -41,7 +41,8 @@ export const logInUser = async (data: {
 
 
     // ✅ **Cache full session in Redis**
-    await redis.set(`session:${user.universityId}`, JSON.stringify(user))
+    await redis.set(`session:${user.universityId}`, JSON.stringify(user), 'EX',
+  60 * 60 * 24)
 
     // ✅ **Set a cookie with only `universityId` (inside Server Action)**
     ;(
@@ -52,6 +53,7 @@ export const logInUser = async (data: {
       secure: process.env.NODE_ENV === 'production', // Secure in production
       sameSite: 'strict',
       path: '/',
+       maxAge: 60 * 60 * 24    // 7 days seesion time has increased to 7 days
     })
 
     console.log(

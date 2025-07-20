@@ -11,7 +11,7 @@ function WorkspaceAccess() {
   
   
     <div className='flex  m-4 justify-between'>
-        <div className='text-white/90'>Role-Permissions Access</div>
+        <div className='text-black'>Role-Permissions Access</div>
         <div><Button className='cursor-pointer  px-[47px] py-2 bg-[#635BFF] ' onClick={()=>{router.push(`/${workspaceId}/roles-permissions`)}}>launch</Button></div>
     </div>
     <div>

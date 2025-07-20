@@ -61,16 +61,16 @@ function WorkspacesettingHeader() {
     if (e.key === 'Enter') handleSubmit(handleSave)() // Submit on Enter key press
   }
 
-  return (
-    <div className="flex items-center justify-between p-6 border-b border-[#333] rounded-md shadow-sm">
+  return (<>
+    <div className="flex items-center mt-2 justify-between p-4   rounded-md ">
       {/* Left: Avatar + Name */}
       <div className="flex items-center gap-4">
         <div
           className={clsx(
-            'w-14 h-14 rounded-full flex items-center justify-center text-2xl font-semibold text-white shadow-md'
+            'w-11 h-11 rounded-full flex items-center justify-center text-lg font-semibold text-black shadow-md'
           )}
           style={{ backgroundColor: bgColor }}
-        >
+          >
           {workspaceData?.workspace?.name.slice(0, 2).toUpperCase()}
         </div>
 
@@ -79,30 +79,30 @@ function WorkspacesettingHeader() {
           <div className="flex items-center gap-2">
             {isEditing ? (
               <input
-                {...register('name')} // React Hook Form registers the input
-                type="text"
-                onBlur={handleSubmit(handleSave)} // Trigger submit on blur
-                onKeyDown={handleKeyDown} // Handle key down event for "Enter"
-                className="text-2xl font-semibold text-[#F5F5F5] bg-transparent border border-[#555] rounded px-2 py-1 focus:outline-none focus:border-[#888] w-full"
+              {...register('name')} // React Hook Form registers the input
+              type="text"
+              onBlur={handleSubmit(handleSave)} // Trigger submit on blur
+              onKeyDown={handleKeyDown} // Handle key down event for "Enter"
+                className="text-lg font-semibold text-black bg-transparent border border-[#555] rounded px-2 py-1 focus:outline-none focus:border-[#888] w-full"
               />
             ) : (
               <span
-                className="text-2xl font-semibold text-[#F5F5F5] cursor-pointer hover:underline"
+                className="text-lg font-semibold text-black cursor-pointer hover:underline"
                 onClick={() => setIsEditing(true)}
               >
                 {isPending || isFetching ? 'Loading...' : workspaceData?.workspace?.name || 'Workspace'}
               </span>
             )}
             <span
-              className="cursor-pointer text-[#aaa] hover:text-white text-lg"
+              className="cursor-pointer text-[#aaa] mt-2 text-xs"
               onClick={() => setIsEditing(true)}
               title="Edit name"
             >
-              ✏️
+              edit.
             </span>
           </div>
 
-          <span className="text-sm text-[#999999] mt-1">
+          <span className="text-xs text-[#999999] mt-1">
             {isRenaming ? 'Renaming workspace...' : 'Workspace Settings'}
           </span>
           
@@ -111,15 +111,41 @@ function WorkspacesettingHeader() {
           
           {/* Display Validation Error */}
           {errors.name && <p className="text-red-500 text-sm mt-2">{errors.name.message}</p>}
+      
         </div>
       </div>
 
       {/* Right: Button */}
-      <CustomButton className="bg-[#635BFF] hover:bg-[#635BFF]/80 text-white px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200">
+      <CustomButton className="bg-[#6ce4FF] hover:bg-[#6ce4FF]/80 text-[#10414d] h-[31px] w-[120px] rounded-md text-sm font-medium transition-all duration-200">
         Invite Members
       </CustomButton>
+     
     </div>
-  )
+    <div className=' items-center justify-between px-2 ml-1 py-2 mt-4 text-sm'>
+      Workspace Name
+      <div className='flex uppercase text-[#10414d] font-semibold text-xs bg-[#f0f0f0] px-2 w-[426px] py-2 mt-0.5 shadow-sm'>
+         {isPending || isFetching ? 'Loading...' : workspaceData?.workspace?.name || 'Workspace'}
+      </div>
+    </div>
+
+     <div className=' items-center justify-between px-2 ml-1 py-2 mt-2 text-sm'>
+      Workspace Slug
+      <div className='flex uppercase text-[#10414d] font-semibold text-xs bg-[#f0f0f0] px-2 w-[426px] py-2 mt-0.5 shadow-sm'>
+         {isPending || isFetching ? 'Loading...' : workspaceData?.workspace?.name || 'Workspace'}
+      </div>
+    </div>
+
+    <div className=' items-center justify-between px-2 ml-1 py-2 mt-2 text-sm'>
+      Workspace ID
+      <div className='flex uppercase text-[#10414d] font-semibold text-xs bg-[#f0f0f0] px-2 w-[426px] py-2 mt-0.5 shadow-sm'>
+         {isPending || isFetching ? 'Loading...' : workspaceData?.workspace?.id || 'Workspace'}
+      </div>
+    </div>
+              
+              
+              
+              </>
+      )
 }
 
 export default WorkspacesettingHeader

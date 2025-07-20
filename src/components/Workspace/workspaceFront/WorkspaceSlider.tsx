@@ -31,7 +31,7 @@ function Slider() {
 
   return (
     <>
-      <aside className="h-full bg-[#ffff] border-r border-[#d4d4d4] p-4 w-[55px]">
+      <aside className="h-full bg-[#ffff] border-r border-[#d4d4d4] p-1 w-[47px]">
         
        
         {/* <Separator className="m-2 bg-[#505152]" /> */}

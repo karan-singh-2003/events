@@ -2,7 +2,11 @@ import React from 'react'
 
 function page() {
   return (
-    <div className='text-white'>Workspace page</div>
+    <>
+    
+    <div className='text-black font-poppins font-semibold'>events</div>
+       </>
+    
   )
 }
 
