@@ -165,3 +165,11 @@
   padding: 1rem;
 }
 
+/* styles/globals.css or tailwind.config.css */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

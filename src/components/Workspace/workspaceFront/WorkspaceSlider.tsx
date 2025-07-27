@@ -9,6 +9,7 @@ import WorkspaceSwitcher from './WorkspaceNavbar/WorkspaceSwitcher'
 import { Button } from '../../ui/button'
 import { Separator } from '../../ui/separator'
 import EventSwitcher from '../../Event/getallEventSwitcher/EventSwitcher'
+import BottomNavigation from './WorkspaceNavbar/BottomNavigation'
 
 function Slider() {
   const sentence = {
@@ -31,7 +32,7 @@ function Slider() {
 
   return (
     <>
-      <aside className="h-full bg-[#ffff] border-r border-[#d4d4d4] p-1 w-[47px]">
+      <aside className="h-full bg-[#ffff] border-r border-[#d4d4d4] hidden lg:block p-1 w-[47px]">
         
        
         {/* <Separator className="m-2 bg-[#505152]" /> */}
@@ -42,6 +43,7 @@ function Slider() {
         <WorkspaceNavigation />
         <EventSwitcher/>
       </aside>
+      <BottomNavigation />
     </>
   )
 }

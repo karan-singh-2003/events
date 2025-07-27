@@ -9,6 +9,7 @@ import {
   PanelGroup,
   PanelResizeHandle,
 } from 'react-resizable-panels'
+import BottomNavigation from '@/src/components/Workspace/workspaceFront/WorkspaceNavbar/BottomNavigation'
 
 interface DashboardlayoutProps {
   children: React.ReactNode
@@ -26,12 +27,12 @@ function Layout({ children }: DashboardlayoutProps) {
       <div className="pt-[49px] h-[calc(100vh)] ">
         <PanelGroup direction="horizontal" className="h-full  ">
           {/* Sidebar Panel */}
-          <Panel defaultSize={10} minSize={8} maxSize={18} className='bg-[#f0f0f0]  '>
+          <Panel defaultSize={10} minSize={8} maxSize={18} className='bg-[#f0f0f0] hidden lg:block '>
             <div className="hidden lg:block fixed top-[49px] left-0 h-[calc(100vh-49px)] w-full max-w-[44px] border-r border-gray-200 bg-white z-40">
               <WorkspaceSlider />
             </div>
           </Panel>
-
+      <BottomNavigation/>
           {/* Resize Handle */}
           <PanelResizeHandle className="w-1 bg-[#f6f6f6]  cursor-col-resize " />
 
